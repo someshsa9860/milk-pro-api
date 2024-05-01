@@ -1,0 +1,26 @@
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.WashtraShala.WashtraShala",
+      "sha256_cert_fingerprints": [
+        "14:6D:E9:83:C5:73:06:50:D8:EE:B9:95:2F:34:FC:64:16:A0:83:42:E6:1D:BE:A8:8A:04:96:B2:3F:CF:44:E5"
+      ]
+    }
+  },
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.WashtraShala.WashtraShala",
+      "sha256_cert_fingerprints": [
+        "A0:29:AE:BC:F4:BF:46:98:C3:9D:15:AD:6D:81:67:FD:A8:DB:59:F7:83:9A:DF:09:B4:7E:2D:77:AB:3B:24:36"
+      ]
+    }
+  }
+]

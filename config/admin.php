@@ -11,7 +11,7 @@ return [
     | login page.
     |
     */
-    'name' => 'Open Admin',
+    'name' => 'Parkall',
 
     /*
     |--------------------------------------------------------------------------
@@ -22,7 +22,7 @@ return [
     | `img` tag, eg '<img src="http://logo-url" alt="Admin logo">'.
     |
     */
-    'logo' => '<b>Open</b> Admin',
+    'logo' => '<b>Parkall</b> Admin',
 
     /*
     |--------------------------------------------------------------------------
@@ -158,7 +158,7 @@ return [
     'upload' => [
 
         // Disk in `config/filesystem.php`.
-        'disk' => 'local',
+        'disk' => 'admin',
 
         // Image and file upload path under the disk above.
         'directory' => [
@@ -410,6 +410,19 @@ return [
     |
     */
     'extensions' => [
+        'ckeditor' => [
+
+            //Set to false if you want to disable this extension
+            'enable' => true,
+
+            // Editor configuration
+            'config' => [
+                'language'      => 'en',
+                'height'        => 500,
+                'contentsCss'   => '/css/frontend-body-content.css',
+            ]
+            ],
+            
 
     ],
 ];

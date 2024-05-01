@@ -3,7 +3,6 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use OpenAdmin\Admin\Config\Config;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -20,7 +19,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        Config::load();  // Add this
+        // Config::load();  // Add this
 
     }
 }
