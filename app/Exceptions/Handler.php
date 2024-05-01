@@ -37,7 +37,7 @@ class Handler extends ExceptionHandler
     {
         $this->reportable(function (Throwable $e) {
             // Add This line
-            // Reporter::report($e);
+            Reporter::report($e);
         });
     }
 }

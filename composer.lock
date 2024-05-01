@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "648e3c020404b151f792726912c76bd4",
+    "content-hash": "ee4e7da5f9bd5bd743fe26d398a6ded5",
     "packages": [
         {
             "name": "beste/clock",
@@ -4143,6 +4143,64 @@
             "time": "2023-02-08T01:06:31+00:00"
         },
         {
+            "name": "open-admin-ext/api-tester",
+            "version": "v1.0.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/open-admin-org/api-tester.git",
+                "reference": "d353fa0395cfba3df0b780713900813c4cd44e9a"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/open-admin-org/api-tester/zipball/d353fa0395cfba3df0b780713900813c4cd44e9a",
+                "reference": "d353fa0395cfba3df0b780713900813c4cd44e9a",
+                "shasum": ""
+            },
+            "require": {
+                "open-admin-org/open-admin": "~1.0",
+                "php": ">=7.0.0"
+            },
+            "require-dev": {
+                "laravel/laravel": "~5.5",
+                "phpunit/phpunit": "~6.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "OpenAdmin\\Admin\\ApiTester\\ApiTesterServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "OpenAdmin\\Admin\\ApiTester\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "open-admin",
+                    "email": "info@open-admin.org"
+                }
+            ],
+            "description": "Api tester for open-admin",
+            "homepage": "https://github.com/open-admin-org/api-tester",
+            "keywords": [
+                "api",
+                "open-admin",
+                "tester"
+            ],
+            "support": {
+                "issues": "https://github.com/open-admin-org/api-tester/issues",
+                "source": "https://github.com/open-admin-org/api-tester/tree/v1.0.2"
+            },
+            "time": "2022-07-01T09:33:07+00:00"
+        },
+        {
             "name": "open-admin-ext/ckeditor",
             "version": "v1.0.3",
             "source": {
@@ -4483,6 +4541,125 @@
                 "source": "https://github.com/open-admin-org/phpinfo/tree/v1.0"
             },
             "time": "2022-02-09T21:43:50+00:00"
+        },
+        {
+            "name": "open-admin-ext/reporter",
+            "version": "dev-main",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/open-admin-org/reporter.git",
+                "reference": "fc221e2bb34c9e02268aa90f1c012437efd147ef"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/open-admin-org/reporter/zipball/fc221e2bb34c9e02268aa90f1c012437efd147ef",
+                "reference": "fc221e2bb34c9e02268aa90f1c012437efd147ef",
+                "shasum": ""
+            },
+            "require": {
+                "ext-json": "*",
+                "laravel/framework": ">=7.0",
+                "open-admin-org/open-admin": ">=1.0.20",
+                "php": ">=7.0.0"
+            },
+            "require-dev": {
+                "laravel/laravel": ">=7.0",
+                "phpunit/phpunit": ">=6.0"
+            },
+            "default-branch": true,
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "OpenAdmin\\Admin\\Reporter\\ReporterServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "OpenAdmin\\Admin\\Reporter\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "sb | Open-admin",
+                    "email": "info@open-admin.org"
+                }
+            ],
+            "description": "Exception reporter for laravel",
+            "homepage": "https://github.com/open-admin-org/reporter",
+            "keywords": [
+                "exception",
+                "open-admin",
+                "reporter"
+            ],
+            "support": {
+                "issues": "https://github.com/open-admin-org/reporter/issues",
+                "source": "https://github.com/open-admin-org/reporter/tree/main"
+            },
+            "time": "2022-06-28T17:27:11+00:00"
+        },
+        {
+            "name": "open-admin-ext/scheduling",
+            "version": "v1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/open-admin-org/scheduling.git",
+                "reference": "c6f9528c33bc179e5813cbddacc0f31b1e262216"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/open-admin-org/scheduling/zipball/c6f9528c33bc179e5813cbddacc0f31b1e262216",
+                "reference": "c6f9528c33bc179e5813cbddacc0f31b1e262216",
+                "shasum": ""
+            },
+            "require": {
+                "open-admin-org/open-admin": "~1.0",
+                "php": ">=7.0.0"
+            },
+            "require-dev": {
+                "laravel/laravel": "~5.5",
+                "phpunit/phpunit": "~6.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "OpenAdmin\\Admin\\Scheduling\\SchedulingServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "OpenAdmin\\Admin\\Scheduling\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "open-admin",
+                    "email": "info@open-admin.org"
+                }
+            ],
+            "description": "Task scheduling extension for open-admin",
+            "homepage": "https://github.com/open-admin-org/scheduling",
+            "keywords": [
+                "open-admin",
+                "scheduling",
+                "task"
+            ],
+            "support": {
+                "issues": "https://github.com/open-admin-org/scheduling/issues",
+                "source": "https://github.com/open-admin-org/scheduling/tree/v1.0.0"
+            },
+            "time": "2022-02-10T23:40:40+00:00"
         },
         {
             "name": "open-admin-org/open-admin",
@@ -10878,7 +11055,9 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {
+        "open-admin-ext/reporter": 20
+    },
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
