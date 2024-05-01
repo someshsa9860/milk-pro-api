@@ -11,7 +11,7 @@ return [
     | login page.
     |
     */
-    'name' => 'Parkall',
+    'name' => 'Milk Pro',
 
     /*
     |--------------------------------------------------------------------------
@@ -22,7 +22,7 @@ return [
     | `img` tag, eg '<img src="http://logo-url" alt="Admin logo">'.
     |
     */
-    'logo' => '<b>Parkall</b> Admin',
+    'logo' => '<b>Milk Pro</b> Admin',
 
     /*
     |--------------------------------------------------------------------------

@@ -22,6 +22,7 @@ class User extends Authenticatable
         'email',
         'password',
     ];
+    public $timestamps = false; // Assuming you don't need timestamps for this model
 
     /**
      * The attributes that should be hidden for serialization.
