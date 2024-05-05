@@ -78,12 +78,14 @@ class AuthController extends Controller
 
                 return $this->returnUserToken($user, $request);
             }
+        }else{
+            if (Hash::check($password, $user->password)) {
+                return $this->returnUserToken($user, $request);
+            }
         }
 
 
-        if (Hash::check($password, $user->password)) {
-            return $this->returnUserToken($user, $request);
-        }
+        
 
 
         return response([
@@ -148,21 +150,8 @@ class AuthController extends Controller
         $user->status = 0;
         $user->save();
 
-        UserActivity::create([
-            'user_name' => auth()->user()->email,
-            'user_id' => auth()->user()->id,
-            'activity' => "logout",
-            'ip_address' => $request->ip(),
-            'location' => $request->location,
-            'mac_address' => $request->mac_address,
-            'device_info' => $request->device_info,
-            'from' => $request->from,
-            'to' => $request->to,
-            'check_in_count' => $request->check_in_count,
-            'slip_amount' => $request->slip_amount,
-            'check_out_amount' => $request->check_out_amount,
-            'address' => $request->address,
-        ]);
+       
+        
 
         // $res1=PersonalAccessToken::where('tokenable_id',$id)->delete();
         // $res2=PersonalAccessToken::where('tokenable_id',$id)->delete();

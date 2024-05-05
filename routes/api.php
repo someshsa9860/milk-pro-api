@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ParkingController;
@@ -39,6 +40,13 @@ Route::group(['middleware' => ['security', 'auth:sanctum']], function () {
     Route::post('users/staffs/create', [UserController::class, 'create']);
     Route::get('users/staffs/status/{id}', [UserController::class, 'status']);
  
-    Route::get('users/staffs/fetch/{location}', [UserController::class, 'fetch']);
+    Route::get('users/staffs/fetch', [UserController::class, 'fetch']);
+
+    
+
+    Route::get('customers/all', [CustomerController::class, 'fetch']);
+    Route::post('customers/create', [CustomerController::class, 'create']);
+    Route::get('customers/status/{id}', [CustomerController::class, 'status']);
+
     
 });
