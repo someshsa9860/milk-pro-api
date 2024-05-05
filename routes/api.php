@@ -44,6 +44,7 @@ Route::group(['middleware' => ['security', 'auth:sanctum']], function () {
 
     
 
+    Route::get('home', [HomeController::class, 'fetch']);
     Route::get('customers/all', [CustomerController::class, 'fetch']);
     Route::post('customers/create', [CustomerController::class, 'create']);
     Route::get('customers/status/{id}', [CustomerController::class, 'status']);
