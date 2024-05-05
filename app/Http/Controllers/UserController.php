@@ -32,32 +32,8 @@ class UserController extends Controller
         return response($user);
     }
 
-    public function createCustomer(Request $request)
-    {
-        $location = $request->location;
-
-        if ($request->id == null) {
-            $request->validate([
-                'username' => ['required', 'string', 'max:255', 'unique:users'],
-            ]);
-        }
-        $user = User::updateOrCreate(
-            ['id' => $request->id],
-            [
-                'name' => $request->name,
-                
-                'username' => $request->username,
-                'mobile' => $request->mobile,
-                'location' => $request->location,
-                'location_id' => auth()->user()->location_id,
-                'user_type' => $request->user_type,
-                'password' => $request->password,
-                'status' => $request->status,
-            ]
-        );
-
-        return response($user);
-    }
+   
+    
 
     public function status($id)  {
         $user=User::find($id);

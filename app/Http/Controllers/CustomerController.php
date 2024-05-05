@@ -12,7 +12,7 @@ class CustomerController extends Controller
     {
         
         $user = UserData::updateOrCreate(
-            ['id'=>$request->id],
+            ['user_id'=>$request->user_id],
             [
                 'route' => $request->route,
                 'last_name' => $request->last_name,
