@@ -24,8 +24,8 @@ class CreateOrderItemsTable extends Migration
             $table->decimal('litres',13,2)->nullable();
             $table->decimal('price',13,2)->nullable();
             $table->string('shift')->nullable();
-            $table->foreign('user_id')->references('id')->on('tbluser')->nullOnDelete();
-            $table->foreign('customer_id')->references('user_id')->on('userdata')->nullOnDelete();
+            // $table->foreign('user_id')->references('id')->on('tbluser')->nullOnDelete();
+            // $table->foreign('customer_id')->references('user_id')->on('userdata')->nullOnDelete();
              $table->foreign('order_id')->references('id')->on('orders')->nullOnDelete();
            
             $table->timestamps();
