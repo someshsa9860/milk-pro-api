@@ -14,7 +14,7 @@ class CreateOrderItemsTable extends Migration
     public function up()
     {
         Schema::create('order_items', function (Blueprint $table) {
-            $table->increments('id');
+            $table->id();
             $table->unsignedBigInteger('order_id')->nullable();
             $table->unsignedBigInteger('user_id')->nullable();
             $table->unsignedBigInteger('customer_id')->nullable();
@@ -24,9 +24,9 @@ class CreateOrderItemsTable extends Migration
             $table->decimal('litres',13,2)->nullable();
             $table->decimal('price',13,2)->nullable();
             $table->string('shift')->nullable();
-            $table->foreign('user_id')->on('tbluser')->references('id')->nullOnDelete();
-            $table->foreign('customer_id')->on('userdata')->references('user_id')->nullOnDelete();
-            $table->foreign('order_id')->on('orders')->references('id')->nullOnDelete();
+            $table->foreign('user_id')->references('id')->on('tbluser')->nullOnDelete();
+            $table->foreign('customer_id')->references('user_id')->on('userdata')->nullOnDelete();
+             $table->foreign('order_id')->references('id')->on('orders')->nullOnDelete();
            
             $table->timestamps();
         });

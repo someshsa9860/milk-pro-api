@@ -22,8 +22,8 @@ class CreateOrdersTable extends Migration
             $table->integer('advance')->default(0)->nullable();
             $table->unsignedBigInteger('customer_id')->nullable();
             $table->unsignedBigInteger('user_id')->nullable();
-            $table->foreign('user_id')->on('tbluser')->references('id')->nullOnDelete();
-            $table->foreign('customer_id')->on('userdata')->references('user_id')->nullOnDelete();
+            $table->foreign('user_id')->references('id')->on('tbluser')->nullOnDelete();
+            $table->foreign('customer_id')->references('user_id')->on('userdata')->nullOnDelete();
             $table->timestamps();
         });
     }
