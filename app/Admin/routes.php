@@ -1,5 +1,7 @@
 <?php
 
+use App\Admin\Controllers\OrderController;
+use App\Admin\Controllers\OrderItemController;
 use App\Admin\Controllers\UserController;
 use Illuminate\Routing\Router;
 
@@ -14,5 +16,9 @@ Route::group([
 
     $router->get('/', 'HomeController@index')->name('home');
     $router->resource('users', UserController::class);
+    $router->resource('orders', OrderController::class);
+    $router->resource('order-items', OrderItemController::class);
+
+
 
 });

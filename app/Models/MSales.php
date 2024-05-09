@@ -30,6 +30,7 @@ class MSales extends Model
         'cprice',
         'bprice',
         'userrout',
+        'shift',
     ];
 
     protected $primaryKey = 'p_id';
