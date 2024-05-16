@@ -72,7 +72,7 @@ class OrderController extends Controller
     public function makeOrderItem(Order $order, $itemData, $type)
     {
         if ($itemData != null) {
-            $order->attachItem(OrderItem::create([
+            OrderItem::create([
                 'order_id' => $order->id,
                 'user_id' => $order->user_id,
                 'fat' => $order->fat,
@@ -84,7 +84,7 @@ class OrderController extends Controller
                 'litres' => $itemData['qty'],
                 'amt' => $itemData['amt'],
                 'rate' => $itemData['rate'],
-            ]));
+            ]);
         }
     }
     public function generateInvoice()
