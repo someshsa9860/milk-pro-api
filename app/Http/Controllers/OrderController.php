@@ -60,10 +60,15 @@ class OrderController extends Controller
         $this->makeOrderItem($order, $cow, 'cow');
         $this->makeOrderItem($order, $buffalo, 'buffalo');
         $this->makeOrderItem($order, $mixed, 'mixed');
-        $order->load('items');
+        $order->load(['items','customer']);
 
         return response($order);
     }
+
+    public function orders() {
+        return response(Order::with(['items','customer'])->get());
+    }
+
     public function makeOrderItem(Order $order, $itemData, $type)
     {
         if ($itemData != null) {

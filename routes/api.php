@@ -50,5 +50,6 @@ Route::group(['middleware' => ['security', 'auth:sanctum']], function () {
     Route::get('customers/status/{id}', [CustomerController::class, 'status']);
 
     Route::post('/order/place', [OrderController::class, 'place']);
+    Route::get('/orders', [OrderController::class, 'orders']);
     
 });
