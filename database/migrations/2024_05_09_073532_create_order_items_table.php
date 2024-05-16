@@ -19,15 +19,14 @@ class CreateOrderItemsTable extends Migration
             $table->unsignedBigInteger('user_id')->nullable();
             $table->unsignedBigInteger('customer_id')->nullable();
             $table->string('type')->nullable();
-            $table->decimal('fat',13,2)->nullable();
-            $table->decimal('snf',13,2)->nullable();
-            $table->decimal('litres',13,2)->nullable();
-            $table->decimal('price',13,2)->nullable();
+            $table->decimal('fat', 13, 2)->nullable();
+            $table->decimal('snf', 13, 2)->nullable();
+            $table->decimal('litres', 13, 2)->nullable();
+            $table->decimal('amt', 13, 2)->nullable();
+            $table->decimal('rate', 13, 2)->nullable();
+            $table->decimal('clr', 13, 2)->nullable();
             $table->string('shift')->nullable();
-            // $table->foreign('user_id')->references('id')->on('tbluser')->nullOnDelete();
-            // $table->foreign('customer_id')->references('user_id')->on('userdata')->nullOnDelete();
-             $table->foreign('order_id')->references('id')->on('orders')->nullOnDelete();
-           
+            $table->foreign('order_id')->references('id')->on('orders')->nullOnDelete();
             $table->timestamps();
         });
     }
