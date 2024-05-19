@@ -60,33 +60,35 @@ class OrderController extends Controller
         $this->makeOrderItem($order, $cow, 'cow');
         $this->makeOrderItem($order, $buffalo, 'buffalo');
         $this->makeOrderItem($order, $mixed, 'mixed');
-        $order->load(['items','customer']);
+        $order->load(['items', 'customer']);
 
         return response($order);
     }
 
-    public function orders() {
-        return response(Order::with(['items','customer'])->get());
+    public function orders()
+    {
+        return response(Order::with(['items', 'customer'])->get());
     }
 
     public function makeOrderItem(Order $order, $itemData, $type)
     {
         if ($itemData != null) {
             OrderItem::updateOrCreate(
-                ['id'=>$itemData['id']],
+                ['id' => $itemData['id']??null],
                 [
-                'order_id' => $order->id,
-                'user_id' => $order->user_id,
-                'fat' => $order->fat,
-                'customer_id' => $order->customer_id,
-                'type' => $type,
-                'snf' => $itemData['snf'],
-                'clr' => $itemData['clr'],
-                'fat' => $itemData['fat'],
-                'litres' => $itemData['qty'],
-                'amt' => $itemData['amt'],
-                'rate' => $itemData['rate'],
-            ]);
+                    'order_id' => $order->id,
+                    'user_id' => $order->user_id,
+                    'fat' => $order->fat,
+                    'customer_id' => $order->customer_id,
+                    'type' => $type,
+                    'snf' => $itemData['snf'],
+                    'clr' => $itemData['clr'],
+                    'fat' => $itemData['fat'],
+                    'litres' => $itemData['qty'],
+                    'amt' => $itemData['amt'],
+                    'rate' => $itemData['rate'],
+                ]
+            );
         }
     }
     public function generateInvoice()
@@ -110,13 +112,13 @@ class OrderController extends Controller
 
         return $existing->id;
     }
-    function delete($id)  {
-        Order::where('id',$id)->delete();
-        OrderItem::where('order_id',$id)->delete();
+    function delete($id)
+    {
+        Order::where('id', $id)->delete();
+        OrderItem::where('order_id', $id)->delete();
 
         return response([
-            'message'=>"Deleted successfully"
+            'message' => "Deleted successfully"
         ]);
-
     }
 }
