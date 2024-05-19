@@ -108,4 +108,13 @@ class OrderController extends Controller
 
         return $existing->id;
     }
+    function delete($id)  {
+        Order::where('id',$id)->delete();
+        OrderItem::where('order_id',$id)->delete();
+
+        return response([
+            'message'=>"Deleted successfully"
+        ]);
+
+    }
 }
