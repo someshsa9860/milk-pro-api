@@ -54,6 +54,18 @@ class OrderController extends AdminController
         $show->field('bill_no', __('Bill no'));
         $show->field('shift', __('Shift'));
         $show->field('total', __('Total'));
+        $show->items('Items', function ($items) {
+            $items->setResource('/admin/order-items');
+
+            $items->type();
+            $items->fat();
+            $items->snf();
+            $items->litres();
+            $items->clr();
+            $items->shift();
+            $items->amt();
+            $items->rate();
+        });
         $show->field('customer_id', __('Customer id'));
         $show->field('user_id', __('User id'));
         $show->field('created_at', __('Created at'));
