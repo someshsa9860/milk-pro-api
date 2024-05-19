@@ -72,7 +72,7 @@ class OrderController extends Controller
     public function makeOrderItem(Order $order, $itemData, $type)
     {
         if ($itemData != null) {
-            OrderItem::createOrUpdate(
+            OrderItem::updateOrCreate(
                 ['id'=>$itemData['id']],
                 [
                 'order_id' => $order->id,
