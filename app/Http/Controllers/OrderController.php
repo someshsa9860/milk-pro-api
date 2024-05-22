@@ -62,6 +62,15 @@ class OrderController extends Controller
         $this->makeOrderItem($order, $mixed, 'mixed');
         $order->load(['items', 'customer']);
 
+        $total=0;
+        foreach ($order->items as $item) {
+            $total=$total+$item->amt;
+        }
+        $order->total=$total;
+        $order->save();
+
+
+
         return response($order);
     }
 
