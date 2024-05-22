@@ -84,7 +84,7 @@ class OrderController extends Controller
                     'snf' => $itemData['snf'],
                     'clr' => $itemData['clr'],
                     'fat' => $itemData['fat'],
-                    'litres' => $itemData['litres'],
+                    'litres' => $itemData['qty'],
                     'amt' => $itemData['amt'],
                     'rate' => $itemData['rate'],
                 ]
