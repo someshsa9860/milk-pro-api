@@ -62,9 +62,19 @@ class OrderController extends AdminController
             $items->snf();
             $items->litres();
             $items->clr();
-            $items->shift();
             $items->amt();
             $items->rate();
+        });
+        $show->customer('Customer', function ($items) {
+           
+            $items->user_id();
+            $items->route();
+            $items->last_name();
+            $items->add1();
+            $items->contact();
+            $items->amount();
+            $items->crate();
+            $items->type();
         });
         $show->field('customer_id', __('Customer id'));
         $show->field('user_id', __('User id'));
