@@ -2,11 +2,15 @@
 
 namespace App\Admin\Controllers;
 
+use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\OrderController as ControllersOrderController;
 use OpenAdmin\Admin\Controllers\AdminController;
 use OpenAdmin\Admin\Form;
 use OpenAdmin\Admin\Grid;
 use OpenAdmin\Admin\Show;
 use \App\Models\Order;
+use App\Models\User;
+use App\Models\UserData;
 
 class OrderController extends AdminController
 {
@@ -66,7 +70,7 @@ class OrderController extends AdminController
             $items->rate();
         });
         $show->customer('Customer', function ($items) {
-           
+
             $items->user_id();
             $items->route();
             $items->last_name();
@@ -93,13 +97,23 @@ class OrderController extends AdminController
     {
         $form = new Form(new Order());
 
-        $form->datetime('order_date_time', __('Order date time'))->default(date('Y-m-d H:i:s'));
-        $form->text('bill_no', __('Bill no'));
-        $form->text('shift', __('Shift'));
-        $form->text('total', __('Total'));
-        $form->number('customer_id', __('Customer id'));
-        $form->number('user_id', __('User id'));
 
+        $form->text('total', __('Total'));
+
+        $form->tab('Basic info', function ($form) {
+
+            $form->radio('shift', __('Shift'))->options([
+                'morning' => 'Morning',
+                'evening' => 'Evening',
+            ])->default('morning');
+            $form->hidden('order_date_time', __('Order date time'))->default(date('Y-m-d H:i:s'));
+            $form->hidden('bill_no', __('Bill no'))->default((new ControllersOrderController())->generateInvoice());
+            $form->select('customer_id', __('Retailer'))->default(User::all()->pluck('name', 'id')->toArray());
+        })->tab('Seo', function ($form) {
+
+            $form->text('meta_title', __('Meta Title'));
+            $form->textarea('meta_description', __('Meta Description'));
+        });
         return $form;
     }
 }

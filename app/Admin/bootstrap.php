@@ -18,4 +18,6 @@
  *
  */
 
+use OpenAdmin\Admin\Facades\Admin;
+
 OpenAdmin\Admin\Form::forget(['editor']);

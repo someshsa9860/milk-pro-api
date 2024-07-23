@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Admin\Forms\NewOrder;
 use App\Models\Invoice;
 use App\Models\MSales;
 use App\Models\Order;
@@ -9,9 +10,16 @@ use App\Models\OrderItem;
 use App\Models\UserData;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use OpenAdmin\Admin\Layout\Content;
 
 class OrderController extends Controller
 {
+    public function newOrder(Content $content)
+    {
+        return $content
+            ->title('New Order')
+            ->body(new NewOrder());
+    }
     public  function place(Request $request)
     {
         // $request->validate([

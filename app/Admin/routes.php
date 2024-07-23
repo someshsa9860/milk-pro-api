@@ -2,7 +2,9 @@
 
 use App\Admin\Controllers\OrderController;
 use App\Admin\Controllers\OrderItemController;
+use App\Admin\Controllers\RetailerController;
 use App\Admin\Controllers\UserController;
+use App\Http\Controllers\OrderController as ControllersOrderController;
 use Illuminate\Routing\Router;
 
 Admin::routes();
@@ -16,6 +18,7 @@ Route::group([
 
     $router->get('/', 'HomeController@index')->name('home');
     $router->resource('users', UserController::class);
+    $router->resource('retailers', RetailerController::class);
     $router->resource('orders', OrderController::class);
     $router->resource('order-items', OrderItemController::class);
 

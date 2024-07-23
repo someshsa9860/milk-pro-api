@@ -35,9 +35,7 @@ Route::get('/force', function (Request $request) {
 });
 
 Route::get('/', function () {
-    $subscriptionPlans = []; // Assuming you have a SubscriptionPlan model
-
-    return view('welcome', compact('subscriptionPlans'));
+    return redirect('/admin');
 });
 
 
