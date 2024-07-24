@@ -110,12 +110,12 @@ class OrderController extends Controller
         //     );
         // }
         if ($itemData != null) {
-            $order[$type . 'fat'] = $itemData['fat'];
-            $order[$type . 'snf'] = $itemData['snf'];
-            $order[$type . 'clr'] = $itemData['clr'];
-            $order[$type . 'litres'] = $itemData['litres'];
-            $order[$type . 'amt'] = $itemData['amt'];
-            $order[$type . 'rate'] = $itemData['rate'];
+            $order[$type . 'fat'] = $itemData['fat']??0;
+            $order[$type . 'snf'] = $itemData['snf']??0;
+            $order[$type . 'clr'] = $itemData['clr']??0;
+            $order[$type . 'litres'] = $itemData['litres']??0;
+            $order[$type . 'amt'] = $itemData['amt']??0;
+            $order[$type . 'rate'] = $itemData['rate']??0;
         }
 
         return $order;
