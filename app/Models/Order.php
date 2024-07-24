@@ -68,13 +68,6 @@ class Order extends Model
 
 
 
-    public function attachItem($item)
-    {
-        $this->items()->attach($item);
-    }
-
-    public function detachItem($item)
-    {
-        $this->items()->detach($item);
-    }
+   
+    
 }
