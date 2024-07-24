@@ -65,7 +65,100 @@ class Order extends Model
 
 
 
+    protected function formatDecimal($value)
+    {
+        return is_numeric($value) ? (float)$value : $value;
+    }
 
+    public function setCowFatAttribute($value)
+    {
+        $this->attributes['cow_fat'] = $this->formatDecimal($value);
+    }
+
+    public function setCowSnfAttribute($value)
+    {
+        $this->attributes['cow_snf'] = $this->formatDecimal($value);
+    }
+
+    public function setCowLitresAttribute($value)
+    {
+        $this->attributes['cow_litres'] = $this->formatDecimal($value);
+    }
+
+    public function setCowAmtAttribute($value)
+    {
+        $this->attributes['cow_amt'] = $this->formatDecimal($value);
+    }
+
+    public function setCowRateAttribute($value)
+    {
+        $this->attributes['cow_rate'] = $this->formatDecimal($value);
+    }
+
+    public function setCowClrAttribute($value)
+    {
+        $this->attributes['cow_clr'] = $this->formatDecimal($value);
+    }
+
+    public function setMixedFatAttribute($value)
+    {
+        $this->attributes['mixed_fat'] = $this->formatDecimal($value);
+    }
+
+    public function setMixedSnfAttribute($value)
+    {
+        $this->attributes['mixed_snf'] = $this->formatDecimal($value);
+    }
+
+    public function setMixedLitresAttribute($value)
+    {
+        $this->attributes['mixed_litres'] = $this->formatDecimal($value);
+    }
+
+    public function setMixedAmtAttribute($value)
+    {
+        $this->attributes['mixed_amt'] = $this->formatDecimal($value);
+    }
+
+    public function setMixedRateAttribute($value)
+    {
+        $this->attributes['mixed_rate'] = $this->formatDecimal($value);
+    }
+
+    public function setMixedClrAttribute($value)
+    {
+        $this->attributes['mixed_clr'] = $this->formatDecimal($value);
+    }
+
+    public function setBuffaloFatAttribute($value)
+    {
+        $this->attributes['buffalo_fat'] = $this->formatDecimal($value);
+    }
+
+    public function setBuffaloSnfAttribute($value)
+    {
+        $this->attributes['buffalo_snf'] = $this->formatDecimal($value);
+    }
+
+    public function setBuffaloLitresAttribute($value)
+    {
+        $this->attributes['buffalo_litres'] = $this->formatDecimal($value);
+    }
+
+    public function setBuffaloAmtAttribute($value)
+    {
+        $this->attributes['buffalo_amt'] = $this->formatDecimal($value);
+    }
+
+    public function setBuffaloRateAttribute($value)
+    {
+        $this->attributes['buffalo_rate'] = $this->formatDecimal($value);
+    }
+
+    public function setBuffaloClrAttribute($value)
+    {
+        $this->attributes['buffalo_clr'] = $this->formatDecimal($value);
+    }
 
 
    

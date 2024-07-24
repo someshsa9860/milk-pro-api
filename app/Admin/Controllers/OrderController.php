@@ -138,19 +138,39 @@ class OrderController extends AdminController
         });
 
         $form->submitted(function (Form $form) {
+             });
 
+        // callback before save
+        $form->saving(function (Form $form) {
+            Log::channel("callvcal")->info(json_encode([
+                'cow'=>[
+                    'initial'=>[
+                        'litres'=>$form->cow_litres,
+                        'fat'=>$form->cow_fat,
+                        'snf'=>$form->cow_snf,
+                        'amt'=>$form->cow_amt,
+                    ]
+                ]
+            ]));
             $cow = $this->calculate('cow_', $form);
             $buffalo = $this->calculate('buffalo_', $form);
             $mixed = $this->calculate('mixed_', $form);
             $this->set('cow_', $form, $cow);
             $this->set('buffalo_', $form, $buffalo);
             $this->set('mixed_', $form, $mixed);
+            Log::channel("callvcal")->info(json_encode([
+                'cow'=>[
+                    'final'=>[
+                        'litres'=>$form->cow_litres,
+                        'fat'=>$form->cow_fat,
+                        'snf'=>$form->cow_snf,
+                        'amt'=>$form->cow_amt,
+                    ]
+                ]
+            ]));
 
             $form->total = ($form->cow_amt ?? 0) + ($form->buffalo_amt ?? 0) + ($form->mixed_amt ?? 0);
-        });
-
-        // callback before save
-        $form->saving(function (Form $form) {
+       
         });
 
         // callback after save
