@@ -16,7 +16,9 @@ Route::group([
     'as'            => config('admin.route.prefix') . '.',
 ], function (Router $router) {
 
-    $router->get('/', 'HomeController@index')->name('home');
+    $router->get('/', function (){
+        return redirect('/admin/orders/create');
+    })->name('home');
     $router->resource('users', UserController::class);
     $router->resource('retailers', RetailerController::class);
     $router->resource('orders', OrderController::class);
