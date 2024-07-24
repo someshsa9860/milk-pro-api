@@ -17,6 +17,26 @@ class Order extends Model
         'user_id',
 
     ];
+    protected $guarded = [
+        'cow_litres',
+        'cow_fat',
+        'cow_clr',
+        'cow_snf',
+        'cow_rate',
+        'cow_amt',
+        'buffalo_litres',
+        'buffalo_fat',
+        'buffalo_clr',
+        'buffalo_snf',
+        'buffalo_rate',
+        'buffalo_amt',
+        'mixed_litres',
+        'mixed_fat',
+        'mixed_clr',
+        'mixed_snf',
+        'mixed_rate',
+        'mixed_amt',
+    ];
     public function items()
     {
         return $this->hasMany(OrderItem::class,'order_id');

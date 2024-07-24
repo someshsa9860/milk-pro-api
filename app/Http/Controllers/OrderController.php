@@ -51,30 +51,32 @@ class OrderController extends Controller
         $buffalo = $request->buffalo;
         $mixed = $request->mixed;
 
+        $order = [
+            'user_id' => auth()->user()->id,
+            'customer_id' => $customer_id,
+            'order_date_time' => $request->order_date_time ?? now(),
+            'shift' => $shift,
+            'bill_no' => $request->bill_no ?? $this->generateInvoice(),
+        ];
+        $order = $this->makeOrderItem($order, $cow, 'cow_');
+        $order = $this->makeOrderItem($order, $buffalo, 'buffalo_');
+        $order = $this->makeOrderItem($order, $mixed, 'mixed_');
         $order = Order::updateOrCreate(
             [
                 'id' => $request->id,
             ],
-            [
-                'user_id' => auth()->user()->id,
-                'customer_id' => $customer_id,
-                'order_date_time' => $request->order_date_time ?? now(),
-                'shift' => $shift,
-                'bill_no' => $request->bill_no ?? $this->generateInvoice(),
-            ]
+            $order
 
         );
 
-        $this->makeOrderItem($order, $cow, 'cow');
-        $this->makeOrderItem($order, $buffalo, 'buffalo');
-        $this->makeOrderItem($order, $mixed, 'mixed');
+
         $order->load(['items', 'customer']);
 
-        $total=0;
+        $total = 0;
         foreach ($order->items as $item) {
-            $total=$total+$item->amt;
+            $total = $total + $item->amt;
         }
-        $order->total=$total;
+        $order->total = $total;
         $order->save();
 
 
@@ -87,26 +89,36 @@ class OrderController extends Controller
         return response(Order::with(['items', 'customer'])->get());
     }
 
-    public function makeOrderItem(Order $order, $itemData, $type)
+    public function makeOrderItem(array $order, $itemData, $type)
     {
+        // if ($itemData != null) {
+        //     OrderItem::updateOrCreate(
+        //         ['id' => $itemData['id']??null],
+        //         [
+        //             'order_id' => $order->id,
+        //             'user_id' => $order->user_id,
+        //             'fat' => $order->fat,
+        //             'customer_id' => $order->customer_id,
+        //             'type' => $type,
+        //             'snf' => $itemData['snf'],
+        //             'clr' => $itemData['clr'],
+        //             'fat' => $itemData['fat'],
+        //             'litres' => $itemData['litres'],
+        //             'amt' => $itemData['amt'],
+        //             'rate' => $itemData['rate'],
+        //         ]
+        //     );
+        // }
         if ($itemData != null) {
-            OrderItem::updateOrCreate(
-                ['id' => $itemData['id']??null],
-                [
-                    'order_id' => $order->id,
-                    'user_id' => $order->user_id,
-                    'fat' => $order->fat,
-                    'customer_id' => $order->customer_id,
-                    'type' => $type,
-                    'snf' => $itemData['snf'],
-                    'clr' => $itemData['clr'],
-                    'fat' => $itemData['fat'],
-                    'litres' => $itemData['litres'],
-                    'amt' => $itemData['amt'],
-                    'rate' => $itemData['rate'],
-                ]
-            );
+            $order[$type . 'fat'] = $itemData['fat'];
+            $order[$type . 'snf'] = $itemData['snf'];
+            $order[$type . 'clr'] = $itemData['clr'];
+            $order[$type . 'litres'] = $itemData['litres'];
+            $order[$type . 'amt'] = $itemData['amt'];
+            $order[$type . 'rate'] = $itemData['rate'];
         }
+
+        return $order;
     }
     public function generateInvoice()
     {
