@@ -34,28 +34,39 @@ class Order extends Model
         'mixed_rate',
         'mixed_amt',
     ];
-    
-    
+
+
     public function items()
     {
-        return $this->hasMany(OrderItem::class,'order_id');
-    }
-    public function getTotal()
-    {
-        return $this->total;
+        $items = [];
+
+        if ($this->cow_litres || $this->cow_fat || $this->cow_clr || $this->cow_snf || $this->cow_rate || $this->cow_amt) {
+            $items[] = new OrderItem('cow', $this->cow_litres, $this->cow_fat, $this->cow_clr, $this->cow_snf, $this->cow_rate, $this->cow_amt);
+        }
+
+        if ($this->buffalo_litres || $this->buffalo_fat || $this->buffalo_clr || $this->buffalo_snf || $this->buffalo_rate || $this->buffalo_amt) {
+            $items[] = new OrderItem('buffalo', $this->buffalo_litres, $this->buffalo_fat, $this->buffalo_clr, $this->buffalo_snf, $this->buffalo_rate, $this->buffalo_amt);
+        }
+
+        if ($this->mixed_litres || $this->mixed_fat || $this->mixed_clr || $this->mixed_snf || $this->mixed_rate || $this->mixed_amt) {
+            $items[] = new OrderItem('mixed', $this->mixed_litres, $this->mixed_fat, $this->mixed_clr, $this->mixed_snf, $this->mixed_rate, $this->mixed_amt);
+        }
+
+        return $items;
     }
 
-    
+
+
 
     public function customer()
     {
-        return $this->belongsTo(UserData::class,'customer_id');
+        return $this->belongsTo(UserData::class, 'customer_id');
     }
 
-    
 
 
-    
+
+
 
     public function attachItem($item)
     {
@@ -66,5 +77,4 @@ class Order extends Model
     {
         $this->items()->detach($item);
     }
-
 }

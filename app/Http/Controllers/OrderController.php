@@ -143,11 +143,11 @@ class OrderController extends Controller
     }
     function delete($id)
     {
-        Order::where('id', $id)->delete();
-        OrderItem::where('order_id', $id)->delete();
+        // Order::where('id', $id)->delete();
+        // OrderItem::where('order_id', $id)->delete();
 
-        return response([
-            'message' => "Deleted successfully"
-        ]);
+        // return response([
+        //     'message' => "Deleted successfully"
+        // ]);
     }
 }
