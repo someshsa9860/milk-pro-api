@@ -70,12 +70,12 @@ class OrderController extends Controller
         );
 
 
-        $order->load(['items', 'customer']);
+        $order->load(['customer']);
 
         $total = 0;
-        foreach ($order->items as $item) {
-            $total = $total + $item->amt;
-        }
+        $total = $total + $order->cow_amt??0;
+        $total = $total + $order->buffalo_amt??0;
+        $total = $total + $order->mixed_amt??0;
         $order->total = $total;
         $order->save();
 

@@ -15,9 +15,6 @@ class Order extends Model
         'advance',
         'customer_id',
         'user_id',
-
-    ];
-    protected $guarded = [
         'cow_litres',
         'cow_fat',
         'cow_clr',
@@ -37,6 +34,8 @@ class Order extends Model
         'mixed_rate',
         'mixed_amt',
     ];
+    
+    
     public function items()
     {
         return $this->hasMany(OrderItem::class,'order_id');
