@@ -7,6 +7,11 @@ use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
+
+    function user()  {
+        return response(User::find(auth()->user()->id));
+    }
+
     public function create(Request $request)
     {
         $location = $request->location;

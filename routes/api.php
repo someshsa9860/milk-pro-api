@@ -41,6 +41,7 @@ Route::group(['middleware' => ['security', 'auth:sanctum']], function () {
     Route::get('users/staffs/status/{id}', [UserController::class, 'status']);
  
     Route::get('users/staffs/fetch', [UserController::class, 'fetch']);
+    Route::get('user', [UserController::class, 'user']);
 
     
 
