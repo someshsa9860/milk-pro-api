@@ -23,7 +23,7 @@ class HomeController extends Controller
             [
                 'retailers'=>UserData::all(),
                 'staffs'=>User::all(),
-                'orders'=>Order::get(),
+                'orders'=>Order::with('customer')->get(),
                 'rates'=>RateList::all()
                 
             
