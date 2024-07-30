@@ -61,7 +61,7 @@ class AuthController extends Controller
 
         $username = $request->email;
         $password = $request->password;
-        $isEncrypted = $request->isEncrypted;
+        $isEncrypted = true;
 
 
         $user = User::where('username', $username)->first();
