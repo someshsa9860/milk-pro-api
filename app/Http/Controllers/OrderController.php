@@ -54,7 +54,7 @@ class OrderController extends Controller
         $order = [
             'user_id' => auth()->user()->id,
             'customer_id' => $customer_id,
-            'order_date_time' => $request->order_date_time ?? now(),
+            'order_date_time' => $request->order_date_time ??date("Y-m-d h:i:s"),
             'shift' => $shift,
             'bill_no' => $request->bill_no ?? $this->generateInvoice(),
         ];
