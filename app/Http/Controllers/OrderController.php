@@ -86,7 +86,7 @@ class OrderController extends Controller
 
     public function orders()
     {
-        return response(Order::with(['items', 'customer'])->get());
+        return response(Order::with([ 'customer'])->get());
     }
 
     public function makeOrderItem(array $order, $itemData, $type)
