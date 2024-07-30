@@ -67,6 +67,7 @@ class Order extends Model
 
     protected function formatDecimal($value)
     {
+        return $value;
         return is_numeric($value) ? (float)$value : $value;
     }
 

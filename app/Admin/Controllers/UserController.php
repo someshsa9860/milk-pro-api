@@ -29,6 +29,8 @@ class UserController extends AdminController
         $grid->quickSearch(function ($model, $query) {
             $model->where('name', 'like', "%{$query}%");
         });
+        $grid->model()->orderBy('id', "desc");
+
         $grid->column('id', __('Id'))->sortable();
         $grid->column('name', __('Name'))->sortable();
         $grid->column('email', __('Email'))->sortable();

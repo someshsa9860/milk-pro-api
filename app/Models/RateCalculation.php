@@ -1,17 +1,13 @@
-<?php
-
-namespace App\Models;
-
-
+<?php namespace App\Models;
 
 class RateCalculation
 {
-    public $clr = 0.0;
-    public $fat = 0.0;
+    public $clr = 0;
+    public $fat = 0;
     public $rate = 0.0;
     public $litres = 0;
     public $amt = 0.0;
-    public $snf = 0.0;
+    public $snf = 0;
 
     public function __construct($clr = 0.0, $fat = 0.0, $rate = 0.0, $litres = 0, $amt = 0.0, $snf = 0.0)
     {
@@ -25,33 +21,35 @@ class RateCalculation
         $this->calRate();
     }
 
-
     public function getSnf()
     {
         if ($this->snf > 0) return $this->snf;
 
-        return ($this->clr / 4) + (0.21 * $this->fat) + 0.36;
+        $snf = ($this->clr / 4) + (0.21 * $this->fat) + 0.36;
+        return $snf == (int)$snf ? (int)$snf : round($snf, 2);
     }
 
     public function getFat()
     {
         if ($this->fat > 0) return $this->fat;
 
-        return ($this->snf - ($this->clr / 4) - 0.36) / 0.21;
+        $fat = ($this->snf - ($this->clr / 4) - 0.36) / 0.21;
+        return $fat == (int)$fat ? (int)$fat : round($fat, 2);
     }
 
     public function getClr()
     {
         if ($this->clr > 0) return $this->clr;
 
-        return (4 * $this->snf) - (4 * 0.21 * $this->fat) - (4 * 0.36);
+        $clr = (4 * $this->snf) - (4 * 0.21 * $this->fat) - (4 * 0.36);
+        return $clr == (int)$clr ? (int)$clr : round($clr, 2);
     }
 
     public function calRate()
     {
-        $this->clr = round($this->getClr(), 1);
-        $this->fat = round($this->getFat(), 1);
-        $this->snf = round($this->getSnf(), 1);
+        $this->clr = $this->getClr();
+        $this->fat = $this->getFat();
+        $this->snf = $this->getSnf();
 
         $rates = RateList::all();
 
@@ -71,3 +69,4 @@ class RateCalculation
         return $this->amt;
     }
 }
+?>

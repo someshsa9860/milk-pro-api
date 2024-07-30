@@ -14,6 +14,7 @@ use App\Models\User;
 use App\Models\UserData;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\MessageBag;
 use OpenAdmin\Admin\Widgets\Table;
 
 class OrderController extends AdminController
@@ -34,6 +35,7 @@ class OrderController extends AdminController
     {
         $grid = new Grid(new Order());
 
+        $grid->model()->orderBy('id', "desc");
         $grid->column('id', __('Id'));
         $grid->column('order_date_time', __('Order date time'));
         $grid->column('bill_no', __('Bill no'));
@@ -121,10 +123,10 @@ class OrderController extends AdminController
             $form->radio('shift', __('Shift'))->options([
                 'morning' => 'Morning',
                 'evening' => 'Evening',
-            ])->default('morning')->required();
+            ])->default('morning');
             $form->hidden('order_date_time', __('Order date time'))->default(date('Y-m-d H:i:s'));
             $form->hidden('bill_no', __('Bill no'))->default((new ControllersOrderController())->generateInvoice());
-            $form->select('customer_id', __('Retailer'))->options(UserData::all()->pluck('last_name', 'user_id'))->required();
+            $form->select('customer_id', __('Retailer'))->options(UserData::all()->pluck('last_name', 'user_id'));
             $form->number('total', __('Total Amount (Optional, auto-calculated if not set)'));
         })->tab('Cow', function ($form) {
             $key = 'cow_';
@@ -138,39 +140,32 @@ class OrderController extends AdminController
         });
 
         $form->submitted(function (Form $form) {
-             });
+        });
 
         // callback before save
         $form->saving(function (Form $form) {
-            Log::channel("callvcal")->info(json_encode([
-                'cow'=>[
-                    'initial'=>[
-                        'litres'=>$form->cow_litres,
-                        'fat'=>$form->cow_fat,
-                        'snf'=>$form->cow_snf,
-                        'amt'=>$form->cow_amt,
-                    ]
-                ]
-            ]));
+
+            if ($form->customer_id == null) 
+            {
+                $error = new MessageBag([
+                    'title'   => 'Error',
+                    'message' => 'Please choose retailer and try again',
+                ]);
+                return back()->with(compact('error'));
+            }
+
+            
+            
             $cow = $this->calculate('cow_', $form);
             $buffalo = $this->calculate('buffalo_', $form);
             $mixed = $this->calculate('mixed_', $form);
             $this->set('cow_', $form, $cow);
             $this->set('buffalo_', $form, $buffalo);
             $this->set('mixed_', $form, $mixed);
-            Log::channel("callvcal")->info(json_encode([
-                'cow'=>[
-                    'final'=>[
-                        'litres'=>$form->cow_litres,
-                        'fat'=>$form->cow_fat,
-                        'snf'=>$form->cow_snf,
-                        'amt'=>$form->cow_amt,
-                    ]
-                ]
-            ]));
+            
+            
 
             $form->total = ($form->cow_amt ?? 0) + ($form->buffalo_amt ?? 0) + ($form->mixed_amt ?? 0);
-       
         });
 
         // callback after save
@@ -183,12 +178,12 @@ class OrderController extends AdminController
 
     function run($key, Form $form)
     {
-        $form->number($key . 'litres', __('Qty, (Required)'));
-        $form->number($key . 'fat', __('fat, (Required)'));
-        $form->number($key . 'snf', __('snf, (Required)'));
-        $form->number($key . 'clr', __('clr'));
-        $form->number($key . 'rate', __('rate'));
-        $form->number($key . 'amt', __('amt'));
+        $form->text($key . 'litres', __('Qty, (Required)'));
+        $form->text($key . 'fat', __('fat, (Required)'));
+        $form->text($key . 'snf', __('snf, (Required)'));
+        $form->text($key . 'clr', __('clr'));
+        $form->text($key . 'rate', __('rate'));
+        $form->text($key . 'amt', __('amt'));
     }
     function set($key, Form $form, $cal)
     {
