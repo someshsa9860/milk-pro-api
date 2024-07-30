@@ -81,7 +81,6 @@ class UserController extends AdminController
         $form->text('name', __('Name'));
         $form->text('username', __('Username'));
         $form->text('password', __('password'));
-        $form->number('route', __('Route'))->default('');
         $form->text('user_type', __('User type'));
         $form->switch('status', __('Block'));
 
