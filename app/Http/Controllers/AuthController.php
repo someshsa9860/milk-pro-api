@@ -59,16 +59,16 @@ class AuthController extends Controller
     public function login(Request $request)
     {
 
-        $email = $request->email;
+        $username = $request->email;
         $password = $request->password;
         $isEncrypted = $request->isEncrypted;
 
 
-        $user = User::where('email', $email)->first();
+        $user = User::where('username', $username)->first();
 
         if (!$user) {
             return response([
-                'message' => "User not found with email " . $email
+                'message' => "User not found with username " . $username
             ], 401);
         }
 
@@ -89,7 +89,7 @@ class AuthController extends Controller
 
 
         return response([
-            'message' => "Wrong password " . $email
+            'message' => "Wrong password " 
         ], 401);
     }
 
