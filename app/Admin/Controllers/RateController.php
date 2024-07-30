@@ -7,17 +7,17 @@ use OpenAdmin\Admin\Controllers\AdminController;
 use OpenAdmin\Admin\Form;
 use OpenAdmin\Admin\Grid;
 use OpenAdmin\Admin\Show;
-use \App\Models\User;
+use \App\Models\RateList;
 use Illuminate\Support\Facades\Hash;
 
-class UserController extends AdminController
+class RateController extends AdminController
 {
     /**
      * Title for current resource.
      *
      * @var string
      */
-    protected $title = 'User';
+    protected $title = 'RateList';
 
     /**
      * Make a grid builder.
@@ -26,18 +26,13 @@ class UserController extends AdminController
      */
     protected function grid()
     {
-        $grid = new Grid(new User());
-        $grid->quickSearch(function ($model, $query) {
-            $model->where('name', 'like', "%{$query}%");
-        });
-        $grid->model()->orderBy('id', "desc");
+        $grid = new Grid(new RateList());
 
-        $grid->column('id', __('Id'))->sortable();
         $grid->column('name', __('Name'))->sortable();
-        $grid->column('username', __('Username'))->sortable();
+        $grid->column('email', __('Email'))->sortable();
         $grid->column('password', __('password'))->sortable();
         $grid->column('route', __('route'))->sortable();
-        $grid->column('user_type', __('User type'))->sortable();
+        $grid->column('RateList_type', __('RateList type'))->sortable();
         $grid->switch('status', __('status'))->sortable();
 
         return $grid;
@@ -51,16 +46,16 @@ class UserController extends AdminController
      */
     protected function detail($id)
     {
-        $show = new Show(User::findOrFail($id));
+        $show = new Show(RateList::findOrFail($id));
 
 
         $show->field('id', __('Id'));
         $show->field('name', __('Name'));
-        $show->field('username', __('Username'));
+        $show->field('email', __('Email'));
         $show->field('password', __('password'));
         $show->field('mobile', __('Mobile'));
         $show->field('route', __('route'));
-        $show->field('user_type', __('User type'));
+        $show->field('RateList_type', __('RateList type'));
         $show->field('status', __('status'));
         $show->field('updated_at', __('Updated at'));
         $show->field('created_at', __('Created at'));
@@ -76,13 +71,13 @@ class UserController extends AdminController
      */
     protected function form()
     {
-        $form = new Form(new User());
+        $form = new Form(new RateList());
 
         $form->text('name', __('Name'));
-        $form->text('username', __('Username'));
+        $form->text('email', __('Email'));
         $form->text('password', __('password'));
         $form->number('route', __('Route'))->default('');
-        $form->text('user_type', __('User type'));
+        $form->text('RateList_type', __('RateList type'));
         $form->switch('status', __('Block'));
 
 
