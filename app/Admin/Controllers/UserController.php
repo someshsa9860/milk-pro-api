@@ -79,8 +79,8 @@ class UserController extends AdminController
         $form = new Form(new User());
 
         $form->text('name', __('Name'));
-        $form->text('username', __('Username'));
-        $form->text('password', __('password'));
+        $form->text('username', __('Username'))->required();
+        $form->text('password', __('password'))->required();
         $form->text('user_type', __('User type'));
         $form->switch('status', __('Block'));
 

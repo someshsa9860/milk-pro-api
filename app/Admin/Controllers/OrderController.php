@@ -15,6 +15,7 @@ use App\Models\UserData;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\MessageBag;
+use OpenAdmin\Admin\Layout\Content;
 use OpenAdmin\Admin\Widgets\Table;
 
 class OrderController extends AdminController
@@ -31,31 +32,95 @@ class OrderController extends AdminController
      *
      * @return Grid
      */
-    protected function grid()
+    protected function grid($type = null)
     {
         $grid = new Grid(new Order());
+        if ($type != null) {
+            switch ($type) {
+                case "ledger":
+                    $this->title = "Ledger Reports";
+                    $grid->disableCreateButton();
+                    $grid->fixHeader();
+                    $grid->expandFilter();
+                    $grid->filter(function ($filter) {
+
+                        // Remove the default id filter
+                        $filter->disableIdFilter();
+
+                        // Add a column filter
+                        $filter->equal('customer_id', __('Retailer'))->select(UserData::all()->pluck('last_name', 'user_id'));
+
+                        //... additional filter options
+                    });
+                    break;
+            }
+        } else {
+            $grid->filter(function ($filter) {
+
+                // Remove the default id filter
+                $filter->disableIdFilter();
+
+                // Add a column filter
+                $filter->date('order_date_time', __('Order Date'));
+
+                //... additional filter options
+            });
+        }
+
+
+
+        return $this->showGrid($grid);
+    }
+    public function showGrid($grid)
+    {
+
+
+
 
         $grid->model()->orderBy('id', "desc");
-        $grid->column('id', __('Id'));
-        $grid->column('order_date_time', __('Order date time'));
-        $grid->column('bill_no', __('Bill no'));
-        $grid->column('shift', __('Shift'));
-        $grid->column('total', __('Total'));
-        $grid->column('customer_id', __('Customer id'));
-        $grid->column('user_id', __('User id'));
-        $grid->column('created_at', __('Created at'));
-        $grid->column('updated_at', __('Updated at'));
+        $grid->column('bill_no', __('Bill no'))->display(function ($title) {
 
+            return "<span style='color:blue; font-weight:500;'> $title</span>";
+        });
+        $grid->column('order_date_time', __('Order date time'));
+
+        $grid->column('shift', __('Shift'));
+        // $grid->column('total', __('Total'));
+        $grid->column('customer.last_name', __('Customer name'));
+
+        $grid->column('total', "Total Amount")->totalRow(function ($title) {
+            return "<span style='display: inline-block; padding: 0.25em 0.4em; font-size: 75%; font-weight: 700; line-height: 1; text-align: center; white-space: nowrap; vertical-align: baseline; border-radius: 0.25rem; color: #fff; background-color: blue;'>Total:  Amount: Rs. $title</span>";
+        });
+
+
+        $grid->column('cow_litres', "Cow Milk")->label()->totalRow(function ($title) {
+            return $this->badge($title, "Cow");
+        });
+        $grid->column('buffalo_litres', "Buffalo Milk")->totalRow(function ($title) {
+            return $this->badge($title, "Buffalo");
+        })->label();
+        $grid->column('mixed_litres', "Mixed Milk")->totalRow(function ($title) {
+            return $this->badge($title, "Mixed");
+        })->label();
+
+        $grid->fixedFooter(true);
+        $grid->export(function ($export) {
+
+            // Filename for export, the default is `table name.csv`
+            $export->filename('Export.csv');
+        
+            $export->originalValue(['cow_litres', 'buffalo_litres','mixed_litres','total','bill_no']);
+
+        });
         return $grid;
     }
 
-    /**
-     * Make a show builder.
-     *
-     * @param mixed $id
-     * @return Show
-     */
-    protected function detail($id)
+    public function badge($title, $name)
+    {
+        return "<span style='display: inline-block; padding: 0.25em 0.4em; font-size: 75%; font-weight: 700; line-height: 1; text-align: center; white-space: nowrap; vertical-align: baseline; border-radius: 0.25rem; color: #fff; background-color: orange;'>$name : $title L</span>";
+    }
+
+    public function detail($id)
     {
         $order = Order::findOrFail($id);
         $show = new Show($order);
@@ -100,6 +165,10 @@ class OrderController extends AdminController
         return $show;
     }
 
+
+
+
+
     function showRun($key, Show $show)
     {
         $show->field($key . 'litres', __('Qty'));
@@ -115,9 +184,9 @@ class OrderController extends AdminController
      * @return Form
      */
 
-    protected function form()
+    public function form($passedForm=null)
     {
-        $form = new Form(new Order());
+        $form =$passedForm?? (new Form(new Order()));
 
         $form->tab('Basic info', function (Form $form) {
             $form->radio('shift', __('Shift'))->options([
@@ -145,8 +214,7 @@ class OrderController extends AdminController
         // callback before save
         $form->saving(function (Form $form) {
 
-            if ($form->customer_id == null) 
-            {
+            if ($form->customer_id == null) {
                 $error = new MessageBag([
                     'title'   => 'Error',
                     'message' => 'Please choose retailer and try again',
@@ -154,16 +222,16 @@ class OrderController extends AdminController
                 return back()->with(compact('error'));
             }
 
-            
-            
+
+
             $cow = $this->calculate('cow_', $form);
             $buffalo = $this->calculate('buffalo_', $form);
             $mixed = $this->calculate('mixed_', $form);
             $this->set('cow_', $form, $cow);
             $this->set('buffalo_', $form, $buffalo);
             $this->set('mixed_', $form, $mixed);
-            
-            
+
+
 
             $form->total = ($form->cow_amt ?? 0) + ($form->buffalo_amt ?? 0) + ($form->mixed_amt ?? 0);
         });

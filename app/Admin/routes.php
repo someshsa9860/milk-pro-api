@@ -1,5 +1,7 @@
 <?php
 
+use App\Admin\Controllers\CollectionSummaryController;
+use App\Admin\Controllers\LedgerController;
 use App\Admin\Controllers\OrderController;
 use App\Admin\Controllers\OrderItemController;
 use App\Admin\Controllers\RetailerController;
@@ -22,7 +24,9 @@ Route::group([
     $router->resource('users', UserController::class);
     $router->resource('retailers', RetailerController::class);
     $router->resource('orders', OrderController::class);
-    $router->resource('order-items', OrderItemController::class);
+    $router->resource('reports/ledger', LedgerController::class);
+    $router->resource('reports/collection/summary', CollectionSummaryController::class);
+    
 
 
 

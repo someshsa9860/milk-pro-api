@@ -52,7 +52,7 @@
                     </div>
                 </div>
 
-                <div class="container">
+                <div class="container" style="font-weight:700">
                     @include('reports', ['vehicles' => $data['vehicles']])
                 </div>
 
