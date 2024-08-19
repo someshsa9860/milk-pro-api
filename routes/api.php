@@ -38,7 +38,7 @@ Route::group(['middleware' => ['security', 'auth:sanctum']], function () {
 
     Route::post('users/password/change', [AuthController::class, 'changePassword']);
     Route::post('users/staffs/create', [UserController::class, 'create']);
-    Route::post('users/staffs/delete', [UserController::class, 'delete']);
+    Route::post('users/staffs/delete/{id}', [UserController::class, 'delete']);
     Route::get('users/staffs/status/{id}', [UserController::class, 'status']);
  
     Route::get('users/staffs/fetch', [UserController::class, 'fetch']);
