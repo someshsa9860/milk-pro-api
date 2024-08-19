@@ -34,7 +34,7 @@ class UserController extends AdminController
 
         $grid->column('id', __('Id'))->sortable();
         $grid->column('name', __('Name'))->sortable();
-        $grid->column('username', __('Username'))->sortable();
+        // $grid->column('username', __('Username'))->sortable();
         $grid->column('password', __('password'))->sortable();
         $grid->column('route', __('route'))->sortable();
         $grid->column('user_type', __('User type'))->sortable();
@@ -80,7 +80,7 @@ class UserController extends AdminController
 
         $form->text('name', __('Name'));
         $form->text('username', __('Username'))->required();
-        $form->text('password', __('password'))->required();
+        $form->password('password', __('password'))->required();
         $form->text('user_type', __('User type'));
         $form->switch('status', __('Block'));
 

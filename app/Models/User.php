@@ -22,6 +22,9 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'mobile',
+        'status',
+        'user_type'
     ];
     public $timestamps = false; // Assuming you don't need timestamps for this model
 

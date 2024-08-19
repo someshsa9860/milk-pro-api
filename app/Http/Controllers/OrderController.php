@@ -64,6 +64,7 @@ class OrderController extends Controller
         $order = Order::updateOrCreate(
             [
                 'id' => $request->id,
+                'location_id'=>auth()->user()->location_id
             ],
             $order
 
@@ -86,7 +87,7 @@ class OrderController extends Controller
 
     public function orders()
     {
-        return response(Order::with([ 'customer'])->get());
+        return response(Order::with([ 'customer'])->where('location_id',auth()->user()->location_id)->get());
     }
 
     public function makeOrderItem(array $order, $itemData, $type)
@@ -143,11 +144,10 @@ class OrderController extends Controller
     }
     function delete($id)
     {
-        // Order::where('id', $id)->delete();
-        // OrderItem::where('order_id', $id)->delete();
+        Order::where('id', $id)->delete();
 
-        // return response([
-        //     'message' => "Deleted successfully"
-        // ]);
+        return response([
+            'message' => "Deleted successfully"
+        ]);
     }
 }

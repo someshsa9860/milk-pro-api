@@ -7,16 +7,7 @@ use App\Http\Controllers\OrderController as ControllersOrderController;
 use OpenAdmin\Admin\Controllers\AdminController;
 use OpenAdmin\Admin\Form;
 use OpenAdmin\Admin\Grid;
-use OpenAdmin\Admin\Show;
 use \App\Models\Order;
-use App\Models\RateCalculation;
-use App\Models\User;
-use App\Models\UserData;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Session;
-use Illuminate\Support\MessageBag;
-use OpenAdmin\Admin\Layout\Content;
-use OpenAdmin\Admin\Widgets\Table;
 
 class CollectionSummaryController extends AdminController
 {

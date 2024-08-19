@@ -22,6 +22,8 @@ class CustomerController extends Controller
                 'crate' => $request->crate,
                 'type' => $request->type,
                 'status' => $request->status,
+            'location_id'=>auth()->user()->location_id
+
             ]
         );
 
@@ -46,7 +48,7 @@ class CustomerController extends Controller
 
     }
     public function fetch()  {
-        $users=UserData::all();
+        $users=UserData::where('location_id',auth()->user()->location_id)->get();
         return response($users);
 
     }

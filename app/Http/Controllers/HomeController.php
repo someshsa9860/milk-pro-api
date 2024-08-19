@@ -21,10 +21,10 @@ class HomeController extends Controller
 
         return response(
             [
-                'retailers'=>UserData::all(),
-                'staffs'=>User::all(),
-                'orders'=>Order::with('customer')->get(),
-                'rates'=>RateList::all()
+                'retailers'=>UserData::where('location_id',auth()->user()->location_id)->get(),
+                'staffs'=>User::where('location_id',auth()->user()->location_id)->get(),
+                'orders'=>Order::with('customer')->where('location_id',auth()->user()->location_id)->get()->get(),
+                'rates'=>RateList::where('location_id',auth()->user()->location_id)->get()()
                 
             
             ]
