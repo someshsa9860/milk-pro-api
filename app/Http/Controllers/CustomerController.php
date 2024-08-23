@@ -37,7 +37,7 @@ class CustomerController extends Controller
 
         if(!$user){
             return response([
-                'message'=>"staff does not exist"
+                'message'=>"VSP does not exist"
             ],401);
         }
 
@@ -45,6 +45,22 @@ class CustomerController extends Controller
         $user->save();
 
         return response($user);
+
+    }
+    public function delete($id)  {
+        $user=UserData::find($id);
+
+        if(!$user){
+            return response([
+                'message'=>"VSP does not exist"
+            ],401);
+        }
+
+        $user->delete();
+
+        return response([
+            'message'=>"VSP Deleted Successfully"
+        ]);
 
     }
     public function fetch()  {
