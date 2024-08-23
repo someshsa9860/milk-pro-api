@@ -96,6 +96,7 @@ class AuthController extends Controller
     public function returnUserToken($user, $request)
     {
 
+        $user->load(['roles','']);
         $response = [
             'token' => $user->createToken('token')->plainTextToken,
             'user' => $user,

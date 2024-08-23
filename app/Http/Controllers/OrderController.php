@@ -54,8 +54,10 @@ class OrderController extends Controller
         $order = [
             'user_id' => auth()->user()->id,
             'customer_id' => $customer_id,
-            'order_date_time' => $request->order_date_time ??date("Y-m-d h:i:s"),
+            'order_date_time' => $request->order_date_time ?? date("Y-m-d h:i:s"),
             'shift' => $shift,
+            'remark' => $request->remark,
+
             'bill_no' => $request->bill_no ?? $this->generateInvoice(),
         ];
         $order = $this->makeOrderItem($order, $cow, 'cow_');
@@ -64,7 +66,7 @@ class OrderController extends Controller
         $order = Order::updateOrCreate(
             [
                 'id' => $request->id,
-                'location_id'=>auth()->user()->location_id
+                'location_id' => auth()->user()->location_id
             ],
             $order
 
@@ -74,9 +76,9 @@ class OrderController extends Controller
         $order->load(['customer']);
 
         $total = 0;
-        $total = $total + $order->cow_amt??0;
-        $total = $total + $order->buffalo_amt??0;
-        $total = $total + $order->mixed_amt??0;
+        $total = $total + $order->cow_amt ?? 0;
+        $total = $total + $order->buffalo_amt ?? 0;
+        $total = $total + $order->mixed_amt ?? 0;
         $order->total = $total;
         $order->save();
 
@@ -87,7 +89,7 @@ class OrderController extends Controller
 
     public function orders()
     {
-        return response(Order::with([ 'customer'])->where('location_id',auth()->user()->location_id)->get());
+        return response(Order::with(['customer'])->where('location_id', auth()->user()->location_id)->get());
     }
 
     public function makeOrderItem(array $order, $itemData, $type)
@@ -111,12 +113,12 @@ class OrderController extends Controller
         //     );
         // }
         if ($itemData != null) {
-            $order[$type . 'fat'] = $itemData['fat']??0;
-            $order[$type . 'snf'] = $itemData['snf']??0;
-            $order[$type . 'clr'] = $itemData['clr']??0;
-            $order[$type . 'litres'] = $itemData['litres']??0;
-            $order[$type . 'amt'] = $itemData['amt']??0;
-            $order[$type . 'rate'] = $itemData['rate']??0;
+            $order[$type . 'fat'] = $itemData['fat'] ?? 0;
+            $order[$type . 'snf'] = $itemData['snf'] ?? 0;
+            $order[$type . 'clr'] = $itemData['clr'] ?? 0;
+            $order[$type . 'litres'] = $itemData['litres'] ?? 0;
+            $order[$type . 'amt'] = $itemData['amt'] ?? 0;
+            $order[$type . 'rate'] = $itemData['rate'] ?? 0;
         }
 
         return $order;

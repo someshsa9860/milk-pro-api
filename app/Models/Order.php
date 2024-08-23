@@ -21,6 +21,7 @@ class Order extends Model
         'cow_snf',
         'cow_rate',
         'cow_amt',
+        'remark',
         'buffalo_litres',
         'buffalo_fat',
         'buffalo_clr',

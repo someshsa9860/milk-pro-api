@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
@@ -33,6 +34,7 @@ class UserController extends Controller
                 'mobile' => ['required', 'string', 'max:255', 'unique:admin_users'],
             ]);
         }
+        $role=$request->role;
 
         $data = [
             'name' => $request->name,
@@ -49,6 +51,21 @@ class UserController extends Controller
             ['id' => $request->id],
             $data
         );
+        $posRoleId = DB::table('admin_roles')->where('slug', $role)->value('id');
+        if (!$posRoleId) {
+            $posRoleId = DB::table('admin_roles')->insertGetId([
+                'name' => $role,
+                'slug' => $role
+            ]);
+        }
+
+        // Assign the role to the user
+        DB::table('admin_role_users')->insert([
+            'role_id' => $posRoleId,
+            'user_id' => $user->id
+        ]);
+
+        $user->load('roles', 'permissions');
 
         return response($user);
     }
