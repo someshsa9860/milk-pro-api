@@ -263,10 +263,12 @@ class OrderController extends AdminController
 
         $form->submitted(function (Form $form) {
         });
-
-        if (is('admin')) {
-            $form->select('location_id', "Location")->options(Location::all()->pluck('location_id', 'location_id'))->default(Admin::user()->location_id);
+        if(is('admin')){
+            $form->select('location_id', "Location")->options(Location::all()->pluck('location_id','location_id'))->default(Admin::user()->location_id);
+        }else{
+            $form->hidden('location_id', "Location")->default(Admin::user()->location_id);
         }
+        
 
         // callback before save
         $form->saving(function (Form $form) {
