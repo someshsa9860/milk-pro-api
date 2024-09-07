@@ -85,68 +85,47 @@ class OrderController extends AdminController
     }
     public function showGrid($grid)
     {
-
-
-
-
+        // Order the results by 'id' in descending order
         $grid->model()->orderBy('id', "desc");
-
+    
+        // If the user is not an admin, filter by location_id
         if (!isAdmin()) {
             $grid->model()->where('location_id', Admin::user()->location_id);
         } else {
             $grid->column('location_id', "Location");
         }
-
+    
         $grid->export(function ($export) {
-
-            $export->originalValue([
-                'order_date_time',
-                'bill_no',
-                'shift',
-                'total',
-                'remark',
-                'advance',
-                'customer_id',
-                'user_id',
-                'cow_litres',
-                'cow_fat',
-                'cow_clr',
-                'cow_snf',
-                'cow_rate',
-                'cow_amt',
-                'buffalo_litres',
-                'buffalo_fat',
-                'buffalo_clr',
-                'buffalo_snf',
-                'buffalo_rate',
-                'buffalo_amt',
-                'mixed_litres',
-                'mixed_fat',
-                'mixed_clr',
-                'mixed_snf',
-                'mixed_rate',
-                'mixed_amt',
-            ]);
-
+            if (!isAdmin()) {
+                $export->except(['location_id']);
+            } 
             
+           
+            
+            $export->originalValue([
+                'bill_no','total','cow_litres','buffalo_litres','mixed_litres'
+            ]);
+        
         });
-
+            
+        // High priority columns
         $grid->column('bill_no', __('Bill no'))->display(function ($title) {
-
             return "<span style='color:blue; font-weight:500;'> $title</span>";
         });
-        $grid->column('location_id', "Location");
+        if (isAdmin()) {
+            $grid->column('location_id', "Location");
+
+        } 
         $grid->column('order_date_time', __('Order date time'));
-
         $grid->column('shift', __('Shift'));
-        // $grid->column('total', __('Total'));
         $grid->column('customer.last_name', __('Customer name'));
-
+    
+        // Total amount column with styling
         $grid->column('total', "Total Amount")->totalRow(function ($title) {
             return "<span style='display: inline-block; padding: 0.25em 0.4em; font-size: 75%; font-weight: 700; line-height: 1; text-align: center; white-space: nowrap; vertical-align: baseline; border-radius: 0.25rem; color: #fff; background-color: blue;'>Total:  Amount: Rs. $title</span>";
         });
-
-
+    
+        // Milk details columns
         $grid->column('cow_litres', "Cow Milk")->label()->totalRow(function ($title) {
             return $this->badge($title, "Cow");
         });
@@ -156,18 +135,32 @@ class OrderController extends AdminController
         $grid->column('mixed_litres', "Mixed Milk")->totalRow(function ($title) {
             return $this->badge($title, "Mixed");
         })->label();
-
+    
+        // Less priority columns at the end
+        $grid->column('cow_fat', __('Cow Fat'));
+        $grid->column('cow_clr', __('Cow CLR'));
+        $grid->column('cow_snf', __('Cow SNF'));
+        $grid->column('cow_rate', __('Cow Rate'));
+        $grid->column('cow_amt', __('Cow Amount'));
+    
+        $grid->column('buffalo_fat', __('Buffalo Fat'));
+        $grid->column('buffalo_clr', __('Buffalo CLR'));
+        $grid->column('buffalo_snf', __('Buffalo SNF'));
+        $grid->column('buffalo_rate', __('Buffalo Rate'));
+        $grid->column('buffalo_amt', __('Buffalo Amount'));
+    
+        $grid->column('mixed_fat', __('Mixed Fat'));
+        $grid->column('mixed_clr', __('Mixed CLR'));
+        $grid->column('mixed_snf', __('Mixed SNF'));
+        $grid->column('mixed_rate', __('Mixed Rate'));
+        $grid->column('mixed_amt', __('Mixed Amount'));
+    
+        // Footer settings
         $grid->fixedFooter(true);
-        $grid->export(function ($export) {
-
-            // Filename for export, the default is `table name.csv`
-            $export->filename('Export.csv');
-
-            $export->originalValue(['cow_litres', 'buffalo_litres', 'mixed_litres', 'total', 'bill_no']);
-        });
+    
         return $grid;
     }
-
+    
     public function badge($title, $name)
     {
         return "<span style='display: inline-block; padding: 0.25em 0.4em; font-size: 75%; font-weight: 700; line-height: 1; text-align: center; white-space: nowrap; vertical-align: baseline; border-radius: 0.25rem; color: #fff; background-color: orange;'>$name : $title L</span>";
@@ -248,12 +241,17 @@ class OrderController extends AdminController
             ])->default('morning');
             $form->hidden('order_date_time', __('Order date time'))->default(date('Y-m-d H:i:s'));
             $form->hidden('bill_no', __('Bill no'))->default((new ControllersOrderController())->generateInvoice());
-            if(is('admin')){
+            if (is('admin')) {
                 $form->select('customer_id', __('Farmer'))->options(UserData::all()->pluck('last_name', 'user_id'));
-            }else{
-                $form->select('customer_id', __('Farmer'))->options(UserData::where('location_id',Admin::user()->location_id)->get()->pluck('last_name', 'user_id'));
+            } else {
+                $form->select('customer_id', __('Farmer'))->options(UserData::where('location_id', Admin::user()->location_id)->get()->pluck('last_name', 'user_id'));
             }
             $form->number('total', __('Total Amount (Optional, auto-calculated if not set)'));
+            if (is('admin')) {
+                $form->select('location_id', "Location")->options(Location::all()->pluck('location_id', 'location_id'))->default(Admin::user()->location_id);
+            } else {
+                $form->hidden('location_id', "Location")->default(Admin::user()->location_id);
+            }
         })->tab('Cow', function ($form) {
             $key = 'cow_';
             $this->run($key, $form);
@@ -265,14 +263,10 @@ class OrderController extends AdminController
             $this->run($key, $form);
         });
 
-        $form->submitted(function (Form $form) {
-        });
-        if(is('admin')){
-            $form->select('location_id', "Location")->options(Location::all()->pluck('location_id','location_id'))->default(Admin::user()->location_id);
-        }else{
-            $form->hidden('location_id', "Location")->default(Admin::user()->location_id);
-        }
-        
+
+
+
+
 
         // callback before save
         $form->saving(function (Form $form) {
