@@ -10,6 +10,7 @@ use App\Models\OrderItem;
 use App\Models\UserData;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use OpenAdmin\Admin\Facades\Admin;
 use OpenAdmin\Admin\Layout\Content;
 
 class OrderController extends Controller
@@ -66,7 +67,7 @@ class OrderController extends Controller
         $order = Order::updateOrCreate(
             [
                 'id' => $request->id,
-                'location_id' => auth()->user()->location_id
+                'location_id' => auth()->user()->location_id??Admin::user()->id
             ],
             $order
 
