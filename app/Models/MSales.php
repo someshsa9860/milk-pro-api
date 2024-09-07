@@ -31,6 +31,7 @@ class MSales extends Model
         'bprice',
         'userrout',
         'shift',
+        'location_id'
     ];
 
     protected $primaryKey = 'p_id';

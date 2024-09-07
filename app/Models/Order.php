@@ -34,6 +34,7 @@ class Order extends Model
         'mixed_snf',
         'mixed_rate',
         'mixed_amt',
+        'location_id'
     ];
 
 

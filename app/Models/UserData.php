@@ -18,6 +18,7 @@ class UserData extends Model
         'crate',
         'type',
         'status',
+        'location_id'
     ];
 
     protected $primaryKey = 'user_id';

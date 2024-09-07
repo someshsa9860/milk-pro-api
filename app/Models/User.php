@@ -103,7 +103,8 @@ class User extends  Model implements AuthenticatableContract
         'password',
         'mobile',
         'status',
-        'user_type'
+        'user_type',
+        'location_id'
     ];
     public $timestamps = false; // Assuming you don't need timestamps for this model
 

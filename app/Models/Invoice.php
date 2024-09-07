@@ -12,6 +12,7 @@ class Invoice extends Model
         'id',
         'year1',
         'indate',
+        'location_id'
     ];
 
     protected $primaryKey = 'id';

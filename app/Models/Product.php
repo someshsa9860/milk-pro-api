@@ -18,6 +18,7 @@ class Product extends Model
         'tprice',
         'ml',
         'img',
+        'location_id'
     ];
 
     protected $primaryKey = 'p_id';
