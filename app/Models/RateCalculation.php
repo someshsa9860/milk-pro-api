@@ -1,5 +1,7 @@
 <?php namespace App\Models;
 
+use App\Admin\Forms\RateChart;
+
 class RateCalculation
 {
     public $clr = 0;
@@ -51,7 +53,7 @@ class RateCalculation
         $this->fat = $this->getFat();
         $this->snf = $this->getSnf();
 
-        $rates = RateList::all();
+        $rates = (new RateChart())->data();
 
         if ($rates->isEmpty()) {
             echo "Rates chart is empty";

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Admin\Forms\RateChart;
 use App\Models\AdsBanner;
 use App\Models\CartItem;
 use App\Models\Category;
@@ -24,7 +25,7 @@ class HomeController extends Controller
                 'retailers'=>UserData::where('location_id',auth()->user()->location_id)->get(),
                 'staffs'=>User::where('location_id',auth()->user()->location_id)->get(),
                 'orders'=>Order::with('customer')->where('location_id',auth()->user()->location_id)->get(),
-                'rates'=>RateList::where('location_id',auth()->user()->location_id)->get()
+                'rates'=>(new RateChart())->data()
                 
             
             ]

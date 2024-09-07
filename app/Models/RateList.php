@@ -6,14 +6,24 @@ use Illuminate\Database\Eloquent\Model;
 
 class RateList extends Model
 {
-    protected $table = 'ratelist'; // Specify the table name
+    // Specify the table associated with the model
+    protected $table = 'ratelist'; 
 
-   
-    
+    // Define the primary key
+    protected $primaryKey = 'srl';
 
-    // Assuming there is no primary key defined explicitly in the table.
-    public $incrementing = false; // Set to false if primary key is not auto-incrementing
-    public $timestamps = false; // Assuming you don't need timestamps for this model
+    // If the primary key is auto-incrementing
+    public $incrementing = true;
+
+    // Disabling timestamps if not needed
+    public $timestamps = false;
+
+    // Define the fillable fields for mass assignment
+    protected $fillable = [
+        'srl',    // Primary key
+        'fat',    // Fat content (assumed)
+        'snf',    // Solid-not-fat content (assumed)
+        'rate',   // Rate value
+        'location_id' // Foreign key for location
+    ];
 }
-
-

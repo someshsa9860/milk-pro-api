@@ -28,9 +28,27 @@ class RetailerController extends AdminController
     protected function grid()
     {
         $grid = new Grid(new UserData());
+        $grid->filter(function ($filter) {
+
+            // Remove the default id filter
+            $filter->disableIdFilter();
+
+            // Add a column filter
+            if (isAdmin()) {
+                $filter->equal('location_id', __('Location'))->select(Location::all()->pluck('location_id', 'location_id'));
+            }
+            //... additional filter options
+        });
+        $grid->model()->orderBy('id', "desc");
+        $grid->expandFilter();
         $grid->quickSearch(function ($model, $query) {
             $model->where('last_name', 'like', "%{$query}%");
         });
+        if (!isAdmin()) {
+            $grid->model()->where('location_id', Admin::user()->location_id);
+        } else {
+            $grid->column('location_id', "Location");
+        }
         $grid->column('status', __('Deleted'))->switch()->sortable();
         $grid->column('location_id', "Location");
         $grid->column('id', __('Id'))->sortable();

@@ -5,6 +5,7 @@ use App\Admin\Controllers\LedgerController;
 use App\Admin\Controllers\LocationController;
 use App\Admin\Controllers\OrderController;
 use App\Admin\Controllers\OrderItemController;
+use App\Admin\Controllers\RateController;
 use App\Admin\Controllers\RetailerController;
 use App\Admin\Controllers\UserController;
 use App\Http\Controllers\OrderController as ControllersOrderController;
@@ -25,6 +26,7 @@ Route::group([
     $router->resource('users', UserController::class);
     $router->resource('auth/users', UserController::class);
     $router->resource('farmers', RetailerController::class);
+    $router->resource('rates', RateController::class);
     $router->resource('orders', OrderController::class);
     $router->resource('reports/ledger', LedgerController::class);
     $router->resource('reports/collection/summary', CollectionSummaryController::class);
