@@ -33,6 +33,7 @@ class RateController extends AdminController
             $grid->model()->where('location_id', Admin::user()->location_id);
         } else {
             $grid->column('location_id', "Location");
+            $grid->model()->where('location_id', Admin::user()->location_id);
         }
         $grid->model()->orderBy('srl', "desc");
         $grid->expandFilter();

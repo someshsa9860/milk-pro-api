@@ -39,7 +39,7 @@ class RetailerController extends AdminController
             }
             //... additional filter options
         });
-        $grid->model()->orderBy('id', "desc");
+        $grid->model()->orderBy('user_id', "desc");
         $grid->expandFilter();
         $grid->quickSearch(function ($model, $query) {
             $model->where('last_name', 'like', "%{$query}%");
