@@ -6,12 +6,12 @@ class RateCalculation
 {
     public $clr = 0;
     public $fat = 0;
-    public $rate = 0.0;
+    public $rate = 0;
     public $litres = 0;
-    public $amt = 0.0;
+    public $amt = 0;
     public $snf = 0;
 
-    public function __construct($clr = 0.0, $fat = 0.0, $rate = 0.0, $litres = 0, $amt = 0.0, $snf = 0.0)
+    public function __construct($clr = 0, $fat = 0, $rate = 0, $litres = 0, $amt = 0, $snf = 0)
     {
         $this->clr = $clr;
         $this->fat = $fat;
@@ -49,26 +49,35 @@ class RateCalculation
 
     public function calRate()
     {
-        $this->clr = $this->getClr();
-        $this->fat = $this->getFat();
-        $this->snf = $this->getSnf();
-
+        // Get and ensure clr, fat, and snf are positive
+        $this->clr = max(0, $this->getClr());
+        $this->fat = max(0, $this->getFat());
+        $this->snf = max(0, $this->getSnf());
+    
+        // Get rates from RateChart
         $rates = (new RateChart())->data();
-
+    
+        // Check if rates chart is empty
         if ($rates->isEmpty()) {
             echo "Rates chart is empty";
-            return 0.0;
+            return 0;
         }
-
+    
+        // Find the rate model matching snf and fat values
         $rateModel = $rates->first(function ($rateModel) {
             return round($rateModel->snf, 1) == round($this->snf, 1) &&
                    round($rateModel->fat, 1) == round($this->fat, 1);
         });
-
-        $this->rate = $rateModel ? $rateModel->rate : 0.0;
+    
+        // Ensure the rate is non-negative, otherwise default to 0
+        $this->rate = max(0, $rateModel ? $rateModel->rate : 0);
+    
+        // Ensure litres is positive before calculating the amount
+        $this->litres = max(0, $this->litres);
         $this->amt = $this->litres * $this->rate;
-
+    
         return $this->amt;
     }
+    
 }
 ?>

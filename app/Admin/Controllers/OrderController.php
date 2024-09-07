@@ -248,7 +248,11 @@ class OrderController extends AdminController
             ])->default('morning');
             $form->hidden('order_date_time', __('Order date time'))->default(date('Y-m-d H:i:s'));
             $form->hidden('bill_no', __('Bill no'))->default((new ControllersOrderController())->generateInvoice());
-            $form->select('customer_id', __('Farmer'))->options(UserData::all()->pluck('last_name', 'user_id'));
+            if(is('admin')){
+                $form->select('customer_id', __('Farmer'))->options(UserData::all()->pluck('last_name', 'user_id'));
+            }else{
+                $form->select('customer_id', __('Farmer'))->options(UserData::where('location_id',Admin::user()->location_id)->get()->pluck('last_name', 'user_id'));
+            }
             $form->number('total', __('Total Amount (Optional, auto-calculated if not set)'));
         })->tab('Cow', function ($form) {
             $key = 'cow_';
