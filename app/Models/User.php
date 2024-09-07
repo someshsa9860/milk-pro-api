@@ -4,9 +4,12 @@ namespace App\Models;
 
 use Illuminate\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Storage;
+use Laravel\Sanctum\HasApiTokens;
 use OpenAdmin\Admin\Auth\Database\HasPermissions;
 use OpenAdmin\Admin\Traits\DefaultDatetimeFormat;
 
@@ -16,6 +19,7 @@ class User extends  Model implements AuthenticatableContract
     use HasPermissions;
     use DefaultDatetimeFormat;
     protected $table='admin_users';
+    use HasApiTokens, HasFactory, Notifiable;
 
     /**
      * Create a new Eloquent model instance.
