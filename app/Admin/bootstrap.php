@@ -21,3 +21,24 @@
 use OpenAdmin\Admin\Facades\Admin;
 
 OpenAdmin\Admin\Form::forget(['editor']);
+function is($role)
+{
+    if (!Admin::user()) {
+        return false;
+    }
+    if(Admin::user()->isAdministrator()){
+        return true;
+    }
+
+    return Admin::user()->isRole($role);
+}
+
+function isAdmin()
+{
+    return  is('admin');
+}
+
+function isVSP()
+{
+    return is('vsp');
+}

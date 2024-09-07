@@ -44,7 +44,7 @@ class LedgerController extends AdminController
             $filter->disableIdFilter();
 
             // Add a column filter
-            $filter->equal('customer_id', __('Retailer'))->select(UserData::all()->pluck('last_name', 'user_id'));
+            $filter->equal('customer_id', __('Farmer'))->select(UserData::all()->pluck('last_name', 'user_id'));
             $filter->date('order_date_time', __('Order Date'));
 
             //... additional filter options

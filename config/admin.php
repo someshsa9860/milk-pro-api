@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\User;
+
 return [
 
     /*
@@ -136,7 +138,7 @@ return [
 
         // Protect agaist brute force attacks
         'throttle_logins'   => true,
-        'throttle_attempts' => 5,
+        'throttle_attempts' => 10,
         'throttle_timeout'  => 900, // in seconds
 
         // The URIs that should be excluded from authorization.
@@ -182,7 +184,7 @@ return [
 
         // User tables and model.
         'users_table' => 'admin_users',
-        'users_model' => OpenAdmin\Admin\Auth\Database\Administrator::class,
+        'users_model' => User::class,
 
         // Role table and model.
         'roles_table' => 'admin_roles',

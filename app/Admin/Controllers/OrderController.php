@@ -4,6 +4,7 @@ namespace App\Admin\Controllers;
 
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\OrderController as ControllersOrderController;
+use App\Models\Location;
 use OpenAdmin\Admin\Controllers\AdminController;
 use OpenAdmin\Admin\Form;
 use OpenAdmin\Admin\Grid;
@@ -15,6 +16,7 @@ use App\Models\UserData;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\MessageBag;
+use OpenAdmin\Admin\Facades\Admin;
 use OpenAdmin\Admin\Layout\Content;
 use OpenAdmin\Admin\Widgets\Table;
 
@@ -48,7 +50,14 @@ class OrderController extends AdminController
                         $filter->disableIdFilter();
 
                         // Add a column filter
-                        $filter->equal('customer_id', __('Retailer'))->select(UserData::all()->pluck('last_name', 'user_id'));
+                        $filter->equal('customer_id', __('Farmer'))->select(UserData::all()->pluck('last_name', 'user_id'));
+
+
+                        if (isAdmin()) {
+                            $filter->equal('location_id', __('Location'))->select(Location::all()->pluck('location_id', 'location_id'));
+                        }
+
+
 
                         //... additional filter options
                     });
@@ -62,11 +71,14 @@ class OrderController extends AdminController
 
                 // Add a column filter
                 $filter->date('order_date_time', __('Order Date'));
-
+                if (isAdmin()) {
+                    $filter->equal('location_id', __('Location'))->select(Location::all()->pluck('location_id', 'location_id'));
+                }
                 //... additional filter options
             });
         }
 
+        $grid->expandFilter();
 
 
         return $this->showGrid($grid);
@@ -78,10 +90,18 @@ class OrderController extends AdminController
 
 
         $grid->model()->orderBy('id', "desc");
+
+        if (!isAdmin()) {
+            $grid->model()->where('location_id', Admin::user()->location_id);
+        } else {
+            $grid->column('location_id', "Location");
+        }
+
         $grid->column('bill_no', __('Bill no'))->display(function ($title) {
 
             return "<span style='color:blue; font-weight:500;'> $title</span>";
         });
+        $grid->column('location_id', "Location");
         $grid->column('order_date_time', __('Order date time'));
 
         $grid->column('shift', __('Shift'));
@@ -108,9 +128,8 @@ class OrderController extends AdminController
 
             // Filename for export, the default is `table name.csv`
             $export->filename('Export.csv');
-        
-            $export->originalValue(['cow_litres', 'buffalo_litres','mixed_litres','total','bill_no']);
 
+            $export->originalValue(['cow_litres', 'buffalo_litres', 'mixed_litres', 'total', 'bill_no']);
         });
         return $grid;
     }
@@ -184,9 +203,9 @@ class OrderController extends AdminController
      * @return Form
      */
 
-    public function form($passedForm=null)
+    public function form($passedForm = null)
     {
-        $form =$passedForm?? (new Form(new Order()));
+        $form = $passedForm ?? (new Form(new Order()));
 
         $form->tab('Basic info', function (Form $form) {
             $form->radio('shift', __('Shift'))->options([
@@ -195,7 +214,7 @@ class OrderController extends AdminController
             ])->default('morning');
             $form->hidden('order_date_time', __('Order date time'))->default(date('Y-m-d H:i:s'));
             $form->hidden('bill_no', __('Bill no'))->default((new ControllersOrderController())->generateInvoice());
-            $form->select('customer_id', __('Retailer'))->options(UserData::all()->pluck('last_name', 'user_id'));
+            $form->select('customer_id', __('Farmer'))->options(UserData::all()->pluck('last_name', 'user_id'));
             $form->number('total', __('Total Amount (Optional, auto-calculated if not set)'));
         })->tab('Cow', function ($form) {
             $key = 'cow_';
@@ -211,13 +230,17 @@ class OrderController extends AdminController
         $form->submitted(function (Form $form) {
         });
 
+        if (is('admin')) {
+            $form->select('location_id', "Location")->options(Location::all()->pluck('location_id', 'location_id'))->default(Admin::user()->location_id);
+        }
+
         // callback before save
         $form->saving(function (Form $form) {
 
             if ($form->customer_id == null) {
                 $error = new MessageBag([
                     'title'   => 'Error',
-                    'message' => 'Please choose retailer and try again',
+                    'message' => 'Please choose Farmer and try again',
                 ]);
                 return back()->with(compact('error'));
             }

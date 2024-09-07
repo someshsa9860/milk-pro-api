@@ -2,6 +2,7 @@
 
 use App\Admin\Controllers\CollectionSummaryController;
 use App\Admin\Controllers\LedgerController;
+use App\Admin\Controllers\LocationController;
 use App\Admin\Controllers\OrderController;
 use App\Admin\Controllers\OrderItemController;
 use App\Admin\Controllers\RetailerController;
@@ -22,11 +23,14 @@ Route::group([
         return redirect('/admin/orders/create');
     })->name('home');
     $router->resource('users', UserController::class);
-    $router->resource('retailers', RetailerController::class);
+    $router->resource('auth/users', UserController::class);
+    $router->resource('farmers', RetailerController::class);
     $router->resource('orders', OrderController::class);
     $router->resource('reports/ledger', LedgerController::class);
     $router->resource('reports/collection/summary', CollectionSummaryController::class);
     
+    $router->resource('locations', LocationController::class);
+
 
 
 

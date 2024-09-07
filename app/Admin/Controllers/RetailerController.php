@@ -3,11 +3,13 @@
 namespace App\Admin\Controllers;
 
 use App\Admin\Actions\LogoutAction;
+use App\Models\Location;
 use OpenAdmin\Admin\Controllers\AdminController;
 use OpenAdmin\Admin\Form;
 use OpenAdmin\Admin\Grid;
 use OpenAdmin\Admin\Show;
 use \App\Models\UserData;
+use OpenAdmin\Admin\Facades\Admin;
 
 class RetailerController extends AdminController
 {
@@ -16,7 +18,7 @@ class RetailerController extends AdminController
      *
      * @var string
      */
-    protected $title = 'Retailers';
+    protected $title = 'Farmers';
 
     /**
      * Make a grid builder.
@@ -27,13 +29,19 @@ class RetailerController extends AdminController
     {
         $grid = new Grid(new UserData());
         $grid->quickSearch(function ($model, $query) {
-            $model->where('name', 'like', "%{$query}%");
+            $model->where('last_name', 'like', "%{$query}%");
         });
+        $grid->column('status', __('Deleted'))->switch()->sortable();
+        $grid->column('location_id', "Location");
         $grid->column('id', __('Id'))->sortable();
         $grid->column('last_name', __('Name'))->sortable();
         $grid->column('contact', __('contact'))->sortable();
         $grid->column('type', __('User type'))->sortable();
-        $grid->switch('status', __('status'))->sortable();
+       
+        $grid->column('location_id', __('Location'))->sortable();
+
+
+
 
         return $grid;
     }
@@ -73,10 +81,12 @@ class RetailerController extends AdminController
 
         $form->text('last_name', __('Name'));
         $form->text('contact', __('mobile'));
-        $form->text('add1', __('Address'));
-        $form->hidden('route', __('Address'))->default(1);
-        $form->text('type', __('User type'))->default("retailer");
         $form->switch('status', __('Block'));
+        if(is('admin')){
+            $form->select('location_id', "Location")->options(Location::all()->pluck('location_id','location_id'))->default(Admin::user()->location_id);
+        }else{
+            $form->hidden('location_id', "Location")->default(Admin::user()->location_id);
+        }
         return $form;
     }
 }

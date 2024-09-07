@@ -27,13 +27,7 @@ class RateController extends AdminController
     protected function grid()
     {
         $grid = new Grid(new RateList());
-
-        $grid->column('name', __('Name'))->sortable();
-        $grid->column('email', __('Email'))->sortable();
-        $grid->column('password', __('password'))->sortable();
-        $grid->column('route', __('route'))->sortable();
-        $grid->column('RateList_type', __('RateList type'))->sortable();
-        $grid->switch('status', __('status'))->sortable();
+        
 
         return $grid;
     }
