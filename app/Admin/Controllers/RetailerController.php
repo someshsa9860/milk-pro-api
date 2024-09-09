@@ -54,7 +54,7 @@ class RetailerController extends AdminController
         $grid->column('id', __('Id'))->sortable();
         $grid->column('last_name', __('Name'))->sortable();
         $grid->column('contact', __('contact'))->sortable();
-        $grid->column('route', __('User route'))->sortable();
+        $grid->column('route', __('User Area'))->sortable();
        
 
 
@@ -78,7 +78,7 @@ class RetailerController extends AdminController
         $show->field('last_name', __('Name'));
         $show->field('contact', __('mobile'));
         $show->field('add1', __('Address'));
-        $show->field('route', __('User route'));
+        $show->field('route', __('User Area'));
         $show->field('status', __('status'));
         $show->field('updated_at', __('Updated at'));
         $show->field('created_at', __('Created at'));
@@ -97,7 +97,7 @@ class RetailerController extends AdminController
         $form = new Form(new UserData());
 
         $form->text('last_name', __('Name'));
-        $form->text('route', __('Route'));
+        $form->text('route', __('Area'));
         $form->text('contact', __('mobile'));
         $form->switch('status', __('Block'));
         if(is('admin')){
