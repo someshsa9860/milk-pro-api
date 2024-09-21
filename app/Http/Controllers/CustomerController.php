@@ -10,9 +10,9 @@ class CustomerController extends Controller
 {
     public function create(Request $request)
     {
-        
+
         $user = UserData::updateOrCreate(
-            ['user_id'=>$request->user_id],
+            ['user_id' => $request->user_id],
             [
                 'route' => $request->route,
                 'last_name' => $request->last_name,
@@ -22,7 +22,7 @@ class CustomerController extends Controller
                 'crate' => $request->crate,
                 'type' => $request->type,
                 'status' => $request->status,
-            'location_id'=>auth()->user()->location_id
+                'location_id' => auth()->user()->location_id
 
             ]
         );
@@ -30,43 +30,42 @@ class CustomerController extends Controller
         return response($user);
     }
 
-   
 
-    public function status($id)  {
-        $user=UserData::find($id);
 
-        if(!$user){
+    public function status($id)
+    {
+        $user = UserData::find($id);
+
+        if (!$user) {
             return response([
-                'message'=>"VSP does not exist"
-            ],401);
+                'message' => "VSP does not exist"
+            ], 401);
         }
 
-        $user->status=$user->status==1?0:1;
+        $user->status = $user->status == 1 ? 0 : 1;
         $user->save();
 
         return response($user);
-
     }
-    public function delete($id)  {
-        $user=UserData::find($id);
+    public function delete($id)
+    {
+        $user = UserData::find($id);
 
-        if(!$user){
+        if (!$user) {
             return response([
-                'message'=>"VSP does not exist"
-            ],401);
+                'message' => "VSP does not exist"
+            ], 401);
         }
 
         $user->delete();
 
         return response([
-            'message'=>"VSP Deleted Successfully"
+            'message' => "VSP Deleted Successfully"
         ]);
-
     }
-    public function fetch()  {
-        $users=UserData::where('location_id',auth()->user()->location_id)->get();
+    public function fetch()
+    {
+        $users = UserData::where('location_id', auth()->user()->location_id)->get();
         return response($users);
-
     }
-
 }

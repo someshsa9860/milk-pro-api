@@ -91,16 +91,14 @@ class OrderController extends AdminController
         // If the user is not an admin, filter by location_id
         if (!isAdmin()) {
             $grid->model()->where('location_id', Admin::user()->location_id);
-        } else {
-            $grid->column('location_id', "Location");
-        }
+        } 
+        
     
         $grid->export(function ($export) {
+            
             if (!isAdmin()) {
                 $export->except(['location_id']);
             } 
-            
-           
             
             $export->originalValue([
                 'bill_no','total','cow_litres','buffalo_litres','mixed_litres'
@@ -114,7 +112,6 @@ class OrderController extends AdminController
         });
         if (isAdmin()) {
             $grid->column('location_id', "Location");
-
         } 
         $grid->column('order_date_time', __('Order date time'));
         $grid->column('shift', __('Shift'));
@@ -154,6 +151,7 @@ class OrderController extends AdminController
         $grid->column('mixed_snf', __('Mixed SNF'));
         $grid->column('mixed_rate', __('Mixed Rate'));
         $grid->column('mixed_amt', __('Mixed Amount'));
+        $grid->column('total_amount', __('Total Amount'))->view('total_amount');
     
         // Footer settings
         $grid->fixedFooter(true);
