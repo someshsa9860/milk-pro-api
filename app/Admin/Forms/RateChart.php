@@ -4,6 +4,7 @@ namespace App\Admin\Forms;
 
 use App\Models\RateList;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use OpenAdmin\Admin\Widgets\Form;
 
 class RateChart extends Form
@@ -81,12 +82,14 @@ class RateChart extends Form
 
         // Fetch rates for the user's location
         $rates = RateList::where('location_id', $location_id)->count();
+        Log::channel('callvcal')->info('rates: '.$rates);
 
         // Check if the $rates collection is empty
         if ($rates == 0) {
             // Fetch default rates where location_id is null
             $defaultRates = RateList::whereNull('location_id')->get();
 
+            Log::channel('callvcal')->info('defaultRates: '.count($defaultRates));
 
             // Loop through the default rates and create new rates for the user's location
             foreach ($defaultRates as $defaultRate) {
