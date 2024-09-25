@@ -93,12 +93,13 @@ class RateChart extends Form
 
             // Loop through the default rates and create new rates for the user's location
             foreach ($defaultRates as $defaultRate) {
-                RateList::create([
+            $res=RateList::create([
                     'rate' => $defaultRate->rate,
                     'snf' => $defaultRate->snf,
                     'fat' => $defaultRate->fat,
                     'location_id'=>$location_id
                 ]);
+                Log::channel('callvcal')->info('defaultRates:res: '.json_encode($res));
             }
         }
     }
