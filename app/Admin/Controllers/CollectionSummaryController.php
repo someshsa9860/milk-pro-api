@@ -12,7 +12,7 @@ use \App\Models\Order;
 class CollectionSummaryController extends AdminController
 {
 
-    protected $title = 'Collection Summary';
+    protected $title = 'MPP collection summary';
 
     protected $controller;
 
