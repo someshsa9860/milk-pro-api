@@ -3,6 +3,7 @@
 namespace App\Admin\Controllers;
 
 use App\Admin\Actions\LogoutAction;
+use App\Admin\Forms\RateImportForm;
 use App\Models\Location;
 use OpenAdmin\Admin\Controllers\AdminController;
 use OpenAdmin\Admin\Form;
@@ -11,6 +12,7 @@ use OpenAdmin\Admin\Show;
 use \App\Models\RateList;
 use Illuminate\Support\Facades\Hash;
 use OpenAdmin\Admin\Facades\Admin;
+use OpenAdmin\Admin\Layout\Content;
 
 class RateController extends AdminController
 {
@@ -47,6 +49,9 @@ class RateController extends AdminController
             if (isAdmin()) {
                 $filter->equal('location_id', __('Location'))->select(Location::all()->pluck('location_id', 'location_id'));
             }
+            $filter->equal('snf', __('snf'));;
+            $filter->equal('fat', __('fat'));;
+
             //... additional filter options
         });
         $grid->column('srl',"SRL")->text()->sortable();
@@ -96,5 +101,12 @@ class RateController extends AdminController
             $form->hidden('location_id', "Location")->default(Admin::user()->location_id);
         }
         return $form;
+    }
+
+    public function import(Content $content)
+    {
+        return $content
+            ->title('Import Rate charts')
+            ->body(new RateImportForm());
     }
 }

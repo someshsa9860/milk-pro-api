@@ -32,6 +32,7 @@ Route::group([
     $router->resource('reports/collection/summary', CollectionSummaryController::class);
     
     $router->resource('locations', LocationController::class);
+    $router->get('/import/rates', [RateController::class,'import']);
 
 
 
