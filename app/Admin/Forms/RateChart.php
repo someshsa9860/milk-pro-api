@@ -84,6 +84,7 @@ class RateChart extends Form
         $rates = RateList::where('location_id', $location_id)->count();
         Log::channel('callvcal')->info('rates: '.$rates);
 
+        return;
         // Check if the $rates collection is empty
         if ($rates == 0) {
             // Fetch default rates where location_id is null
