@@ -28,6 +28,10 @@ class RateImportForm extends Form
      */
     public function handle(Request $request)
     {
+        $location_type = $request->location_type;
+        $locations = $request->locations ?? [];
+        $types = $request->types;
+        $shifts = $request->shifts;
         // Check if the file is uploaded
         if ($request->hasFile('file')) {
             try {
@@ -82,17 +86,30 @@ class RateImportForm extends Form
                         $snf = $headers[$h];
                         $fat = ($records[$r])[$headers[0]];
                         $rate = ($records[$r])[$headers[$h]];
-                        $model = RateList::updateOrCreate(
-                            [
-                                'snf' => $snf,
-                                'fat' => $fat,
-                                'location_id'=>$request->location_id
-                            ],
-                            [
-                                'rate' => $rate
-                            ]
-                        );
-                        Log::channel('callvcal')->info('CSV model: ' . json_encode($model));
+
+                        if ($location_type == '0') {
+                            $locations = Location::all()->pluck('location_id', 'location_id');
+                        }
+                        foreach ($locations as $location) {
+                            foreach ($shifts as $shift) {
+                                foreach ($types as $type) {
+                                    $search = [
+                                        'snf' => $snf,
+                                        'fat' => $fat,
+                                        'location_id' => $location,
+                                        'shift' => $shift,
+                                        'type' => $type,
+                                    ];
+                                    RateList::updateOrCreate(
+                                        $search,
+                                        [
+                                            'rate' => $rate
+                                        ]
+                                    );
+                                    Log::channel('callvcal')->info('search: ' . json_encode($search));
+                                }
+                            }
+                        }
                     }
                 }
 
@@ -132,7 +149,24 @@ class RateImportForm extends Form
      */
     public function form()
     {
-        $this->select('location_id', "Choose Location")->options(Location::all()->pluck('location_id', 'location_id'))->required();
+
+        $this->radio('location_type', 'Locations')->options([
+            '0' => 'All',
+            '1' => 'Choose'
+        ])->when(1, function (Form $form) {
+            $this->multipleSelect('locations', "Choose Location")->options(Location::all()->pluck('location_id', 'location_id'));
+        })->required();
+        $this->checkbox('types', "Milk Type")->options([
+            'cow' => "Cow",
+            'buffalo' => "Buffalo",
+            'mixed' => "Mixed",
+        ]);
+        $this->checkbox('shifts', "Shift")->options([
+            'morning' => "Morning",
+            'evening' => "Evening",
+        ]);
+
+
         $this->file('file', 'Select CSV File')->rules('file|mimes:csv,xls,xlsx')->required();
     }
 

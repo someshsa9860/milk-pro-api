@@ -10,10 +10,14 @@ class RateCalculation
     public $litres = 0;
     public $amt = 0;
     public $snf = 0;
+    public $shift = 0;
+    public $type = 0;
 
-    public function __construct($clr = 0, $fat = 0, $rate = 0, $litres = 0, $amt = 0, $snf = 0)
+    public function __construct($clr = 0, $fat = 0, $rate = 0, $litres = 0, $amt = 0, $snf = 0,$shift=null,$type=null)
     {
         $this->clr = $clr;
+        $this->shift = $shift;
+        $this->type = $type;
         $this->fat = $fat;
         $this->rate = $rate;
         $this->litres = $litres;
@@ -66,7 +70,7 @@ class RateCalculation
         // Find the rate model matching snf and fat values
         $rateModel = $rates->first(function ($rateModel) {
             return round($rateModel->snf, 1) == round($this->snf, 1) &&
-                   round($rateModel->fat, 1) == round($this->fat, 1);
+                   round($rateModel->fat, 1) == round($this->fat, 1)&&($rateModel);
         });
     
         // Ensure the rate is non-negative, otherwise default to 0

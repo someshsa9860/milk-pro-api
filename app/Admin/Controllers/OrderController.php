@@ -279,9 +279,9 @@ class OrderController extends AdminController
 
 
 
-            $cow = $this->calculate('cow_', $form);
-            $buffalo = $this->calculate('buffalo_', $form);
-            $mixed = $this->calculate('mixed_', $form);
+            $cow = $this->calculate('cow', $form);
+            $buffalo = $this->calculate('buffalo', $form);
+            $mixed = $this->calculate('mixed', $form);
             $this->set('cow_', $form, $cow);
             $this->set('buffalo_', $form, $buffalo);
             $this->set('mixed_', $form, $mixed);
@@ -318,15 +318,17 @@ class OrderController extends AdminController
         $form->{$key . 'amt'} = $cal->amt;
     }
 
-    function calculate($key, Form $form)
+    function calculate($type, Form $form,$shift)
     {
         $cal = new RateCalculation(
-            litres: $form->{$key . "litres"},
-            snf: $form->{$key . "snf"},
-            rate: $form->{$key . "rate"},
-            clr: $form->{$key . "clr"},
-            amt: $form->{$key . "amt"},
-            fat: $form->{$key . "fat"}
+            litres: $form->{$type.'_' . "litres"},
+            snf: $form->{$type.'_' . "snf"},
+            rate: $form->{$type.'_' . "rate"},
+            clr: $form->{$type.'_' . "clr"},
+            amt: $form->{$type.'_' . "amt"},
+            fat: $form->{$type.'_' . "fat"},
+            type:$type,
+            shift:$form->shift
 
         );
 

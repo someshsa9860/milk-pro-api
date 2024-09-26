@@ -24,6 +24,8 @@ class RateList extends Model
         'fat',    // Fat content (assumed)
         'snf',    // Solid-not-fat content (assumed)
         'rate',   // Rate value
-        'location_id' // Foreign key for location
+        'location_id', // Foreign key for location
+        'type',
+        'shift'
     ];
 }
