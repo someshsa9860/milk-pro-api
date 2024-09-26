@@ -318,7 +318,7 @@ class OrderController extends AdminController
         $form->{$key . 'amt'} = $cal->amt;
     }
 
-    function calculate($type, Form $form,$shift)
+    function calculate($type, Form $form)
     {
         $cal = new RateCalculation(
             litres: $form->{$type.'_' . "litres"},

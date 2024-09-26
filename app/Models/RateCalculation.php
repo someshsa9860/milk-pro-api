@@ -59,7 +59,8 @@ class RateCalculation
         $this->snf = max(0, $this->getSnf());
     
         // Get rates from RateChart
-        $rates = (new RateChart())->data();
+        $location_id = auth()->user()->location_id;
+        $rates = RateList::where('location_id', $location_id)->get();
     
         // Check if rates chart is empty
         if ($rates->isEmpty()) {
@@ -70,11 +71,11 @@ class RateCalculation
         // Find the rate model matching snf and fat values
         $rateModel = $rates->first(function ($rateModel) {
             return round($rateModel->snf, 1) == round($this->snf, 1) &&
-                   round($rateModel->fat, 1) == round($this->fat, 1)&&($rateModel);
+                   round($rateModel->fat, 1) == round($this->fat, 1)&&($rateModel->shift==$this->shift);
         });
     
         // Ensure the rate is non-negative, otherwise default to 0
-        $this->rate = max(0, $rateModel ? $rateModel->rate : 0);
+        $this->rate = max(0, $rateModel ? $rateModel->{$this->type}?? $rateModel->rate : 0);
     
         // Ensure litres is positive before calculating the amount
         $this->litres = max(0, $this->litres);

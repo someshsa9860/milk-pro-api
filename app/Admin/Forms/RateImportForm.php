@@ -2,6 +2,7 @@
 
 namespace App\Admin\Forms;
 
+use App\Jobs\RateImporter;
 use App\Models\Location;
 use App\Models\RateList;
 use Illuminate\Http\Request;
@@ -50,74 +51,21 @@ class RateImportForm extends Form
                     admin_toastr('Uploaded file is not readable.', 'error');
                     return back();
                 }
+                $csvFile = $request->file('file');
 
-                // Optional: Check the contents of the file (log first 500 characters)
-                $contents = file_get_contents($csvFile);
-                Log::info("CSV file contents: " . substr($contents, 0, 500)); // Log the first 500 characters for debugging
+                $newFilePath =  time() . '_.' . $csvFile->getClientOriginalExtension();  // Optional: Use timestamp to avoid duplicate names
 
-                // Create a CSV reader instance from the file path
-                $csv = Reader::createFromPath($csvFile, 'r');
+                // Store the file in the storage/app/csv directory (or any other directory you specify)
+                $csvFile->move(public_path('csv'), $newFilePath);
+                // $csvFile->storeAs('csv', public_path($newFilePath));  // stores file in storage/app/csv/
 
-                // Set the header offset to 0 (indicating the first row contains headers)
-                $csv->setHeaderOffset(0);
+                // To access the file later, you can use the following path:
+                $path = public_path('csv' . '/'.$newFilePath);
 
-                // Get the headers (keys)
-                $headers = $csv->getHeader();
-                Log::info('CSV Headers: ' . json_encode($headers));
 
-                // Initialize an array to store records (values)
-                $records = [];
 
-                // Loop through each record in the CSV
-                foreach ($csv->getRecords() as $record) {
-                    // Skip empty records
-                    if ($this->isRecordEmpty($record)) {
-                        continue;
-                    }
-
-                    // Append each non-empty record to the records array
-                    $records[] = $record;
-                }
-
-                //headers are SNF
-                // $records are fats
-                for ($h = 1; $h < count($headers); $h++) {
-                    for ($r = 0; $r < count($records); $r++) {
-                        $snf = $headers[$h];
-                        $fat = ($records[$r])[$headers[0]];
-                        $rate = ($records[$r])[$headers[$h]];
-
-                        if ($location_type == '0') {
-                            $locations = Location::all()->pluck('location_id', 'location_id');
-                        }
-                        foreach ($locations as $location) {
-                            foreach ($shifts as $shift) {
-                                foreach ($types as $type) {
-                                    $search = [
-                                        'snf' => $snf,
-                                        'fat' => $fat,
-                                        'location_id' => $location,
-                                        'shift' => $shift,
-                                        'type' => $type,
-                                    ];
-                                    RateList::updateOrCreate(
-                                        $search,
-                                        [
-                                            'rate' => $rate
-                                        ]
-                                    );
-                                    Log::channel('callvcal')->info('search: ' . json_encode($search));
-                                }
-                            }
-                        }
-                    }
-                }
-
-                // Log both headers and records
-                // Log::channel('callvcal')->info('CSV Headers: ' . json_encode($headers));
-                // Log::channel('callvcal')->info('CSV Records: ' . json_encode($records));
-
-                // Success message
+                // $locations,$location_type,$types,$shifts,$headers,$records
+                RateImporter::dispatchAfterResponse($locations, $location_type, $types, $shifts,  $path);
                 admin_toastr('CSV processed successfully.', 'success');
             } catch (\Exception $e) {
                 // Handle exceptions
@@ -131,19 +79,7 @@ class RateImportForm extends Form
         return back();
     }
 
-    /**
-     * Helper function to check if a CSV record is empty.
-     * This function assumes the record is an associative array.
-     */
-    private function isRecordEmpty($record)
-    {
-        foreach ($record as $field) {
-            if (!empty(trim($field))) {
-                return false; // Found a non-empty field
-            }
-        }
-        return true; // All fields are empty
-    }
+
     /**
      * Build a form here.
      */

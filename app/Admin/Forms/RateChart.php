@@ -54,25 +54,7 @@ class RateChart extends Form
         // Fetch rates for the user's location
         $rates = RateList::where('location_id', $location_id)->get();
 
-        // Check if the $rates collection is empty
-        if ($rates->isEmpty()) {
-            // Fetch default rates where location_id is null
-            $defaultRates = RateList::whereNull('location_id')->get();
-
-
-            // Loop through the default rates and create new rates for the user's location
-            foreach ($defaultRates as $defaultRate) {
-                RateList::create([
-                    'rate' => $defaultRate->rate,
-                    'snf' => $defaultRate->snf,
-                    'fat' => $defaultRate->fat,
-                    'location_id'=>$location_id
-                ]);
-            }
-
-            // Fetch the newly created rates after updating
-            $rates = RateList::where('location_id', $location_id)->get();
-        }
+        
 
         // Return the rates for the location
         return $rates;

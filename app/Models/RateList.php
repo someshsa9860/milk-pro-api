@@ -26,6 +26,10 @@ class RateList extends Model
         'rate',   // Rate value
         'location_id', // Foreign key for location
         'type',
-        'shift'
+        'shift',
+        'cow',
+        'buffalo',
+        'mixed',
+
     ];
 }

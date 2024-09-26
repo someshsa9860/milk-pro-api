@@ -58,6 +58,9 @@ class RateController extends AdminController
         $grid->column('snf',"SNF")->text()->sortable();
         $grid->column('fat',"FAT")->text()->sortable();
         $grid->column('rate',"RATE")->text()->sortable();
+        $grid->column('cow',"Cow Rate")->text()->sortable();
+        $grid->column('buffalo',"Buffalo Rate")->text()->sortable();
+        $grid->column('mixed',"Mixed Rate")->text()->sortable();
         return $grid;
     }
 
