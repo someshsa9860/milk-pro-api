@@ -47,6 +47,7 @@ Route::group(['middleware' => ['security', 'auth:sanctum']], function () {
     
 
     Route::get('home', [HomeController::class, 'fetch']);
+    Route::get('/rates/sync', [HomeController::class, 'getRates']);
     Route::get('customers/all', [CustomerController::class, 'fetch']);
     Route::post('customers/create', [CustomerController::class, 'create']);
     Route::get('customers/delete', [CustomerController::class, 'delete']);

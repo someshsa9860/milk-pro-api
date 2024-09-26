@@ -22,10 +22,19 @@ class HomeController extends Controller
 
         return response(
             [
-                'retailers'=>UserData::where('location_id',auth()->user()->location_id)->get(),
-                'staffs'=>User::where('location_id',auth()->user()->location_id)->get(),
-                'orders'=>Order::with('customer')->where('location_id',auth()->user()->location_id)->get(),
-                'rates'=>RateList::where('location_id', auth()->user()->location_id)->get()
+                'retailers' => UserData::where('location_id', auth()->user()->location_id)->get(),
+                'staffs' => User::where('location_id', auth()->user()->location_id)->get(),
+                'orders' => Order::with('customer')->where('location_id', auth()->user()->location_id)->get(),
+                'rates' => RateList::where('location_id', auth()->user()->location_id)->get()
+            ]
+        );
+    }
+    public function getRates()
+    {
+
+        return response(
+            [
+                'rates' => RateList::where('location_id', auth()->user()->location_id)->get()
             ]
         );
     }
