@@ -122,7 +122,9 @@ class RateImporter implements ShouldQueue
                             foreach ($types as $type) {
                                 $model->{$type} = $rate;
                             }
+                            $model->save();
                         }
+
                     }
                 }
             }
