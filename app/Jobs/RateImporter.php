@@ -45,7 +45,7 @@ class RateImporter implements ShouldQueue
 
         // Check if the file is uploaded
         try {
-            Log::channel('callvcal')->info('CSV processing : ');
+            // Log::channel('callvcal')->info('CSV processing : locations' . json_encode($locations));
             $csv = Reader::createFromPath($path, 'r');
 
             // Set the header offset to 0 (indicating the first row contains headers)
@@ -53,7 +53,7 @@ class RateImporter implements ShouldQueue
 
             // Get the headers (keys)
             $headers = $csv->getHeader();
-            Log::info('CSV Headers: ' . json_encode($headers));
+            // Log::info('CSV Headers: ' . json_encode($headers));
 
             // Initialize an array to store records (values)
             $records = [];
@@ -70,9 +70,9 @@ class RateImporter implements ShouldQueue
             }
             // $records are fats
             for ($h = 1; $h < count($headers); $h++) {
-                Log::channel('callvcal')->info('h: ' . json_encode($h));
+                // Log::channel('callvcal')->info('h: ' . json_encode($h));
                 for ($r = 0; $r < count($records); $r++) {
-                    Log::channel('callvcal')->info('r: ' . json_encode($r));
+                    // Log::channel('callvcal')->info('r: ' . json_encode($r));
                     $snf = $headers[$h];
                     $fat = ($records[$r])[$headers[0]];
                     $rate = ($records[$r])[$headers[$h]];
@@ -81,50 +81,51 @@ class RateImporter implements ShouldQueue
                         $locations = Location::all()->pluck('location_id', 'location_id');
                     }
                     foreach ($locations as $location) {
-                        Log::channel('callvcal')->info('location: ' . json_encode($location));
-                        // foreach ($shifts as $shift) {
-                        //     Log::channel('callvcal')->info('shift: ' . json_encode($shift));
-                        //     foreach ($types as $type) {
-                        //         Log::channel('callvcal')->info('type: ' . json_encode($type));
-                        //         $search = [
-                        //             'snf' => $snf,
-                        //             'fat' => $fat,
-                        //             'location_id' => $location,
-                        //             'shift' => $shift,
-                        //             'type' => $type,
-                        //         ];
-                        //         RateList::updateOrCreate(
-                        //             $search,
-                        //             [
-                        //                 'rate' => $rate
-                        //             ]
-                        //         );
-                        //         Log::channel('callvcal')->info('search: ' . json_encode($search));
-                        //     }
-                        // }
+                        if ($location != '' && $location != null) {
+                            // Log::channel('callvcal')->info('location: ' . json_encode($location));
+                            // foreach ($shifts as $shift) {
+                            //     Log::channel('callvcal')->info('shift: ' . json_encode($shift));
+                            //     foreach ($types as $type) {
+                            //         Log::channel('callvcal')->info('type: ' . json_encode($type));
+                            //         $search = [
+                            //             'snf' => $snf,
+                            //             'fat' => $fat,
+                            //             'location_id' => $location,
+                            //             'shift' => $shift,
+                            //             'type' => $type,
+                            //         ];
+                            //         RateList::updateOrCreate(
+                            //             $search,
+                            //             [
+                            //                 'rate' => $rate
+                            //             ]
+                            //         );
+                            //         Log::channel('callvcal')->info('search: ' . json_encode($search));
+                            //     }
+                            // }
 
 
 
-                        foreach ($shifts as $shift) {
-                            $search = [
-                                'snf' => $snf,
-                                'fat' => $fat,
-                                'location_id' => $location,
-                                'shift' => $shift,
+                            foreach ($shifts as $shift) {
+                                $search = [
+                                    'snf' => $snf,
+                                    'fat' => $fat,
+                                    'location_id' => $location,
+                                    'shift' => $shift,
 
-                            ];
-                            $model = RateList::updateOrCreate(
-                                $search,
-                                [
-                                    'rate' => $rate
-                                ]
-                            );
-                            foreach ($types as $type) {
-                                $model->{$type} = $rate;
+                                ];
+                                $model = RateList::updateOrCreate(
+                                    $search,
+                                    [
+                                        'rate' => $rate
+                                    ]
+                                );
+                                foreach ($types as $type) {
+                                    $model->{$type} = $rate;
+                                }
+                                $model->save();
                             }
-                            $model->save();
                         }
-
                     }
                 }
             }
