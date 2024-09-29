@@ -134,6 +134,7 @@ class UserController extends AdminController
 
         $form->display('created_at', trans('admin.created_at'));
         $form->display('updated_at', trans('admin.updated_at'));
+        $form->switch('status', __('Deleted'))->default(0);
 
         $form->saving(function (Form $form) {
             if ($form->password && $form->model()->password != $form->password) {
