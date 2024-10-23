@@ -58,7 +58,7 @@ class OrderController extends Controller
             'order_date_time' => $request->order_date_time ?? date("Y-m-d h:i:s"),
             'shift' => $shift,
             'remark' => $request->remark,
-
+            'advance' => $request->advance,
             'bill_no' => $request->bill_no ?? $this->generateInvoice(),
         ];
         $order = $this->makeOrderItem($order, $cow, 'cow_');
