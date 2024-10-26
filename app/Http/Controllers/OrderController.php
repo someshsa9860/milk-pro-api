@@ -48,12 +48,14 @@ class OrderController extends Controller
                     'location_id' => auth()->user()->location_id??Admin::user()->id
                 ],
                 [
+                    'customer_id'=>$request->customer_id,
                     'is_sell'=>$request->is_sell,
                     'advance'=>$request->advance,
                     'order_date_time'=>now(),
                     'remark'=>$request->remark,
                 ]
             );
+            $order->load(['customer']);
             return response($order);
         }
 
