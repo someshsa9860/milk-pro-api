@@ -51,7 +51,7 @@ class OrderController extends Controller
                     'customer_id'=>$request->customer_id,
                     'is_sell'=>$request->is_sell,
                     'payment'=>$request->payment,
-                    'order_date_time'=>date("Y-m-d h:i:s"),
+                    'order_date_time'=>$request->order_date_time??date("Y-m-d h:i:s"),
                     'remark'=>$request->remark,
                 ]
             );
