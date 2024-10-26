@@ -15,6 +15,7 @@ class Order extends Model
         'remark',
         'advance',
         'customer_id',
+        'is_sell',
         'user_id',
         'cow_litres',
         'cow_fat',
