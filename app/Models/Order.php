@@ -14,6 +14,7 @@ class Order extends Model
         'total',
         'remark',
         'advance',
+        'payment',
         'customer_id',
         'is_sell',
         'user_id',

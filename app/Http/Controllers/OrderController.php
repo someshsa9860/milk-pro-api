@@ -50,8 +50,8 @@ class OrderController extends Controller
                 [
                     'customer_id'=>$request->customer_id,
                     'is_sell'=>$request->is_sell,
-                    'advance'=>$request->advance,
-                    'order_date_time'=>now(),
+                    'payment'=>$request->payment,
+                    'order_date_time'=>date("Y-m-d h:i:s"),
                     'remark'=>$request->remark,
                 ]
             );
