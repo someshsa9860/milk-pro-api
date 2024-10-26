@@ -41,6 +41,21 @@ class OrderController extends Controller
         //     'shift'=>$request->shift,
         // ]);
 
+        if($request->is_sell==1){
+            $order = Order::updateOrCreate(
+                [
+                    'id' => $request->id,
+                    'location_id' => auth()->user()->location_id??Admin::user()->id
+                ],
+                [
+                    'is_sell'=>$request->is_sell,
+                    'advance'=>$request->advance,
+                    'remark'=>$request->remark,
+                ]
+            );
+            return response($order);
+        }
+
         $request->validate([
             'customer_id' => ['required'],
             'shift' => ['required'],
