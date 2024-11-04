@@ -151,7 +151,7 @@ class OrderController extends AdminController
         $grid->column('mixed_snf', __('Mixed SNF'));
         $grid->column('mixed_rate', __('Mixed Rate'));
         $grid->column('mixed_amt', __('Mixed Amount'));
-        $grid->column('total_amount', __('Total Amount'))->view('total_amount');
+        $grid->column('total_amount', __('Total Amount'));
     
         // Footer settings
         $grid->fixedFooter(true);
