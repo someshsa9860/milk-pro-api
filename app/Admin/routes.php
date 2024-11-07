@@ -20,9 +20,11 @@ Route::group([
     'as'            => config('admin.route.prefix') . '.',
 ], function (Router $router) {
 
-    $router->get('/', function (){
-        return redirect('/admin/orders/create');
-    })->name('home');
+    // $router->get('/', function (){
+    //     return redirect('/admin/orders/create');
+    // })->name('home');
+    $router->get('/', 'HomeController@index')->name('home');
+
     $router->resource('users', UserController::class);
     $router->resource('auth/users', UserController::class);
     $router->resource('farmers', RetailerController::class);
