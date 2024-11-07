@@ -54,6 +54,7 @@ class RateController extends AdminController
 
             //... additional filter options
         });
+        $grid->column('shift',"shift")->text()->sortable();
         $grid->column('srl',"SRL")->text()->sortable();
         $grid->column('snf',"SNF")->text()->sortable();
         $grid->column('fat',"FAT")->text()->sortable();
