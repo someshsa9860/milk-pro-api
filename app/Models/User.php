@@ -106,7 +106,7 @@ class User extends  Model implements AuthenticatableContract
         'email',
         'password',
         'mobile',
-        'status',
+        'status','can_edit_order_date',
         'user_type',
         'location_id'
     ];

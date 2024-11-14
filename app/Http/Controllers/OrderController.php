@@ -7,6 +7,7 @@ use App\Models\Invoice;
 use App\Models\MSales;
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Models\User;
 use App\Models\UserData;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -41,6 +42,14 @@ class OrderController extends Controller
         //     'shift'=>$request->shift,
         // ]);
 
+       $order_date_time= $request->order_date_time;
+        if(isset($request->order_date_time)){
+            $user=User::find(auth()->user()->id);
+            if($user->can_edit_order_date!=1){
+                $order_date_time=null;
+            }
+        }
+
         if($request->is_sell==1){
             $order = Order::updateOrCreate(
                 [
@@ -51,7 +60,7 @@ class OrderController extends Controller
                     'customer_id'=>$request->customer_id,
                     'is_sell'=>$request->is_sell,
                     'payment'=>$request->payment,
-                    'order_date_time'=>$request->order_date_time??date("Y-m-d h:i:s"),
+                    'order_date_time'=>$order_date_time??date("Y-m-d h:i:s"),
                     'remark'=>$request->remark,
                 ]
             );

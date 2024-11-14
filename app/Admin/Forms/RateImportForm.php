@@ -66,7 +66,7 @@ class RateImportForm extends Form
 
                 // $locations,$location_type,$types,$shifts,$headers,$records
                 RateImporter::dispatchAfterResponse($locations, $location_type, $types, $shifts,  $path);
-                admin_toastr('CSV processed successfully.', 'success');
+                admin_toastr('CSV processed successfully. Please wait for 10 min, we are working in background', 'success');
             } catch (\Exception $e) {
                 // Handle exceptions
                 Log::error('CSV processing failed: ' . $e->getMessage());
