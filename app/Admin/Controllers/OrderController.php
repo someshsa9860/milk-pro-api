@@ -109,7 +109,7 @@ class OrderController extends AdminController
         // High priority columns
         $grid->column('bill_no', __('Bill no'))->display(function ($title) {
             return "<span style='color:blue; font-weight:500;'> $title</span>";
-        });
+        })->sortable();
         if (isAdmin()) {
             $grid->column('location_id', "Location");
         } 
