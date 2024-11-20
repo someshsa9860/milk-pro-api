@@ -3,6 +3,7 @@
 namespace App\Admin\Controllers;
 
 use App\Admin\Actions\LogoutAction;
+use App\Admin\Forms\DownloadReport;
 use App\Admin\Forms\RateImportForm;
 use App\Models\Location;
 use OpenAdmin\Admin\Controllers\AdminController;
@@ -113,4 +114,5 @@ class RateController extends AdminController
             ->title('Import Rate charts')
             ->body(new RateImportForm());
     }
+   
 }

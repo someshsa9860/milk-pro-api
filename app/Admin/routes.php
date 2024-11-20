@@ -35,6 +35,7 @@ Route::group([
     
     $router->resource('locations', LocationController::class);
     $router->get('/import/rates', [RateController::class,'import']);
+    $router->get('/reports/export', [OrderController::class,'export']);
 
 
 

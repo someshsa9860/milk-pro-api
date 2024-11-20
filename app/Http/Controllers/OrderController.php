@@ -132,9 +132,15 @@ class OrderController extends Controller
         $from = request()->query('from');
         $to = request()->query('to');
         $customer_id = request()->query('customer_id');
+        $location_id = auth()->user()->location_id;
 
+        $filePath= public_path($this->export($from,$to,$customer_id,$location_id)) ;
+        return response()->download($filePath)->deleteFileAfterSend(true);
+    }
+
+    public function  export($from,$to,$customer_id,$location_id){
         // Fetch the orders
-        $query = Order::with('customer');
+        $query = Order::with('customer')->where('location_id',$location_id);
         if (isset($customer_id)) {
             $query = $query->where('customer_id', $customer_id);
         }
@@ -264,13 +270,13 @@ class OrderController extends Controller
         // Save the Excel file
         $fileName = 'ledger_report_' . now()->format('Y_m_d_H_i_s') . '.xlsx';
         $writer = new Xlsx($spreadsheet);
-        $filePath = storage_path($fileName);
+        $filePath = public_path($fileName);
         $writer->save($filePath);
 
+        return $fileName;
         // Return the file for download
-        return response()->download($filePath)->deleteFileAfterSend(true);
+        return response()->download($fileName)->deleteFileAfterSend(true);
     }
-
 
 
 

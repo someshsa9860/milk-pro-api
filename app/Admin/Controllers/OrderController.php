@@ -2,6 +2,7 @@
 
 namespace App\Admin\Controllers;
 
+use App\Admin\Forms\DownloadReport;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\OrderController as ControllersOrderController;
 use App\Models\Location;
@@ -333,5 +334,11 @@ class OrderController extends AdminController
         );
 
         return $cal;
+    }
+    public function export(Content $content)
+    {
+        return $content
+            ->title('Export Reports')
+            ->body(new DownloadReport());
     }
 }

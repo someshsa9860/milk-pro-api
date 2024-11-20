@@ -56,3 +56,11 @@ Route::get('/download', function () {
         return Response::make('File not found.', 404);
     }
 });
+Route::get('/download-report/{file}', function ($file) {
+    $filePath = public_path( $file);
+    if (file_exists($filePath)) {
+        return Response::download($filePath)->deleteFileAfterSend(true);
+    } else {
+        return abort(404, 'File not found');
+    }
+});
