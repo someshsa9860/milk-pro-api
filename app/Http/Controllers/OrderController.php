@@ -134,7 +134,7 @@ class OrderController extends Controller
         $customer_id = request()->query('customer_id');
 
         // Fetch the orders
-        $query = Order::with(['customer', 'location']);
+        $query = Order::with('customer');
         if (isset($customer_id)) {
             $query = $query->where('customer_id', $customer_id);
         }
@@ -163,7 +163,7 @@ class OrderController extends Controller
             if ($order->cow_amt > 0) {
                 $orderData[] = [
                     $order->location_id ?? 'N/A',
-                    $order->customer->name ?? 'N/A',
+                    $order->customer->last_name ?? 'N/A',
                     $order->order_date_time,
                     $order->shift,
                     'Cow',
@@ -187,7 +187,7 @@ class OrderController extends Controller
             if ($order->buffalo_amt > 0) {
                 $orderData[] = [
                     $order->location_id ?? 'N/A',
-                    $order->customer->name ?? 'N/A',
+                    $order->customer->last_name ?? 'N/A',
                     $order->order_date_time,
                     $order->shift,
                     'Buffalo',
@@ -211,7 +211,7 @@ class OrderController extends Controller
             if ($order->mixed_amt > 0) {
                 $orderData[] = [
                     $order->location_id ?? 'N/A',
-                    $order->customer->name ?? 'N/A',
+                    $order->customer->last_name ?? 'N/A',
                     $order->order_date_time,
                     $order->shift,
                     'Mixed',

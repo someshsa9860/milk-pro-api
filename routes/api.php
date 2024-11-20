@@ -59,4 +59,3 @@ Route::group(['middleware' => ['security', 'auth:sanctum']], function () {
     Route::get('/reports/ledger/print', [OrderController::class, 'printLedger']);
     
 });
-    Route::get('/reports/ledger/print', [OrderController::class, 'printLedger']);
