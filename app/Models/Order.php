@@ -66,7 +66,10 @@ class Order extends Model
     {
         return $this->belongsTo(UserData::class, 'customer_id');
     }
-
+    public function location()
+    {
+        return $this->belongsTo(Location::class, 'location_id');
+    }
 
 
     // protected function formatDecimal($value)

@@ -11,8 +11,11 @@ use App\Models\User;
 use App\Models\UserData;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
 use OpenAdmin\Admin\Facades\Admin;
 use OpenAdmin\Admin\Layout\Content;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class OrderController extends Controller
 {
@@ -42,26 +45,26 @@ class OrderController extends Controller
         //     'shift'=>$request->shift,
         // ]);
 
-       $order_date_time= $request->order_date_time;
-        if(isset($request->order_date_time)){
-            $user=User::find(auth()->user()->id);
-            if($user->can_edit_order_date!=1){
-                $order_date_time=null;
+        $order_date_time = $request->order_date_time;
+        if (isset($request->order_date_time)) {
+            $user = User::find(auth()->user()->id);
+            if ($user->can_edit_order_date != 1) {
+                $order_date_time = null;
             }
         }
 
-        if($request->is_sell==1){
+        if ($request->is_sell == 1) {
             $order = Order::updateOrCreate(
                 [
                     'id' => $request->id,
-                    'location_id' => auth()->user()->location_id??Admin::user()->id
+                    'location_id' => auth()->user()->location_id ?? Admin::user()->id
                 ],
                 [
-                    'customer_id'=>$request->customer_id,
-                    'is_sell'=>$request->is_sell,
-                    'payment'=>$request->payment,
-                    'order_date_time'=>$order_date_time??date("Y-m-d h:i:s"),
-                    'remark'=>$request->remark,
+                    'customer_id' => $request->customer_id,
+                    'is_sell' => $request->is_sell,
+                    'payment' => $request->payment,
+                    'order_date_time' => $order_date_time ?? date("Y-m-d h:i:s"),
+                    'remark' => $request->remark,
                 ]
             );
             $order->load(['customer']);
@@ -94,7 +97,7 @@ class OrderController extends Controller
         $order = Order::updateOrCreate(
             [
                 'id' => $request->id,
-                'location_id' => auth()->user()->location_id??Admin::user()->id
+                'location_id' => auth()->user()->location_id ?? Admin::user()->id
             ],
             $order
 
@@ -119,6 +122,160 @@ class OrderController extends Controller
     {
         return response(Order::with(['customer'])->where('location_id', auth()->user()->location_id)->get());
     }
+
+
+
+
+
+    public function printLedger()
+    {
+        $from = request()->query('from');
+        $to = request()->query('to');
+        $customer_id = request()->query('customer_id');
+
+        // Fetch the orders
+        $query = Order::with(['customer', 'location']);
+        if (isset($customer_id)) {
+            $query = $query->where('customer_id', $customer_id);
+        }
+        if (isset($from)) {
+            $query = $query->where('order_date_time', '>=', $from);
+        }
+        if (isset($to)) {
+            $query = $query->where('order_date_time', '<=', $to);
+        }
+        $orders = $query->get();
+
+        // Define headers
+        $headers = [
+            'VSP', 'Member', 'Date', 'Shift', 'Type', 'Litres', 'Fat', 'CLR', 'SNF', 'Rate', 'Amount', 'Total', 'Remark', 'Advance', 'Payment',
+        ];
+
+        // Initialize total counters
+        $totalAmount = 0;
+        $totalAdvance = 0;
+        $totalPayment = 0;
+
+        // Prepare data rows
+        $orderData = [];
+        foreach ($orders as $order) {
+            // Add cow details if amount > 0
+            if ($order->cow_amt > 0) {
+                $orderData[] = [
+                    $order->location_id ?? 'N/A',
+                    $order->customer->name ?? 'N/A',
+                    $order->order_date_time,
+                    $order->shift,
+                    'Cow',
+                    $order->cow_litres,
+                    $order->cow_fat,
+                    $order->cow_clr,
+                    $order->cow_snf,
+                    $order->cow_rate,
+                    $order->cow_amt,
+                    $order->total,
+                    $order->remark,
+                    $order->advance,
+                    $order->payment,
+                ];
+                $totalAmount += $order->cow_amt;
+                $totalAdvance += $order->advance;
+                $totalPayment += $order->payment;
+            }
+
+            // Add buffalo details if amount > 0
+            if ($order->buffalo_amt > 0) {
+                $orderData[] = [
+                    $order->location_id ?? 'N/A',
+                    $order->customer->name ?? 'N/A',
+                    $order->order_date_time,
+                    $order->shift,
+                    'Buffalo',
+                    $order->buffalo_litres,
+                    $order->buffalo_fat,
+                    $order->buffalo_clr,
+                    $order->buffalo_snf,
+                    $order->buffalo_rate,
+                    $order->buffalo_amt,
+                    $order->total,
+                    $order->remark,
+                    $order->advance,
+                    $order->payment,
+                ];
+                $totalAmount += $order->buffalo_amt;
+                $totalAdvance += $order->advance;
+                $totalPayment += $order->payment;
+            }
+
+            // Add mixed details if amount > 0
+            if ($order->mixed_amt > 0) {
+                $orderData[] = [
+                    $order->location_id ?? 'N/A',
+                    $order->customer->name ?? 'N/A',
+                    $order->order_date_time,
+                    $order->shift,
+                    'Mixed',
+                    $order->mixed_litres,
+                    $order->mixed_fat,
+                    $order->mixed_clr,
+                    $order->mixed_snf,
+                    $order->mixed_rate,
+                    $order->mixed_amt,
+                    $order->total,
+                    $order->remark,
+                    $order->advance,
+                    $order->payment,
+                ];
+                $totalAmount += $order->mixed_amt;
+                $totalAdvance += $order->advance;
+                $totalPayment += $order->payment;
+            }
+        }
+
+        // Create a new spreadsheet
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        // Add headers to the first row
+        $columnIndex = 'A';
+        foreach ($headers as $header) {
+            $sheet->setCellValue($columnIndex . '1', $header);
+            $columnIndex++;
+        }
+
+        // Add order data to the spreadsheet
+        $row = 2; // Start from the second row
+        foreach ($orderData as $data) {
+            $columnIndex = 'A'; // Reset column index for each row
+            foreach ($data as $value) {
+                $sheet->setCellValue($columnIndex . $row, $value);
+                $columnIndex++;
+            }
+            $row++;
+        }
+
+        // Add summation rows
+        $sheet->setCellValue('A' . $row, 'Totals');
+        $sheet->mergeCells('A' . $row . ':E' . $row); // Merge for better display
+        $sheet->setCellValue('K' . $row, $totalAmount); // Total Amount
+        $sheet->setCellValue('M' . $row, $totalAdvance); // Total Advance
+        $sheet->setCellValue('N' . $row, $totalPayment); // Total Payment
+
+        // Save the Excel file
+        $fileName = 'ledger_report_' . now()->format('Y_m_d_H_i_s') . '.xlsx';
+        $writer = new Xlsx($spreadsheet);
+        $filePath = storage_path($fileName);
+        $writer->save($filePath);
+
+        // Return the file for download
+        return response()->download($filePath)->deleteFileAfterSend(true);
+    }
+
+
+
+
+
+
 
     public function makeOrderItem(array $order, $itemData, $type)
     {

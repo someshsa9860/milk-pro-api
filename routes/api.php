@@ -56,5 +56,7 @@ Route::group(['middleware' => ['security', 'auth:sanctum']], function () {
     Route::post('/order/place', [OrderController::class, 'place']);
     Route::get('/orders', [OrderController::class, 'orders']);
     Route::get('/orders/delete/{id}', [OrderController::class, 'delete']);
+    Route::get('/reports/ledger/print', [OrderController::class, 'printLedger']);
     
 });
+    Route::get('/reports/ledger/print', [OrderController::class, 'printLedger']);
