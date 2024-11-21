@@ -140,7 +140,11 @@ class OrderController extends Controller
 
     public function  export($from,$to,$customer_id,$location_id){
         // Fetch the orders
-        $query = Order::with('customer')->where('location_id',$location_id);
+        $query = Order::with('customer');
+
+        if (isset($location_id)) {
+            $query = $query->where('location_id', $location_id);
+        }
         if (isset($customer_id)) {
             $query = $query->where('customer_id', $customer_id);
         }
