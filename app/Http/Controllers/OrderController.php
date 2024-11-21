@@ -268,9 +268,14 @@ class OrderController extends Controller
         $sheet->setCellValue('N' . $row, $totalPayment); // Total Payment
 
         // Save the Excel file
-        $fileName = 'ledger_report_' . now()->format('Y_m_d_H_i_s') . '.xlsx';
+        $fileName = 'reports/ledger_report_' . now()->format('Y_m_d_H_i_s') . '.xlsx';
+
+ 
         $writer = new Xlsx($spreadsheet);
         $filePath = public_path($fileName);
+        if(!file_exists(public_path('reports'))){
+            mkdir(public_path('reports'));
+        }
         $writer->save($filePath);
 
         return $fileName;

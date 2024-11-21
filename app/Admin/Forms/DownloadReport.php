@@ -33,14 +33,35 @@ class DownloadReport extends Form
      */
     public function handle(Request $request)
     {
-        // Generate the file path
-        $fileName = (new ControllersOrderController())->export($request->from, $request->to, $request->customer_id, $request->location_id);
+        $filePath = (new ControllersOrderController())->export($request->from, $request->to, $request->customer_id, $request->location_id);
 
-        return Response::download(public_path($fileName));
+        $fileName = ($filePath);
+        $downloadUrl = url($fileName);
 
-        // Return the URL for the download
-        return redirect('/download-report/'.($fileName));
+        // Return HTML with a JavaScript redirect and back navigation
+        return response()->make(
+            "<html>
+                <head>
+                    <script>
+                        // Redirect to the download URL
+                        window.location.href = '$downloadUrl';
+                        
+                        // After a short delay, go back to the previous page
+                        setTimeout(function() {
+                            window.history.back();
+                        }, 2000);
+                    </script>
+                </head>
+                <body>
+                    <p>Redirecting to download...</p>
+                </body>
+            </html>"
+        );
     }
+
+
+
+
 
 
 
