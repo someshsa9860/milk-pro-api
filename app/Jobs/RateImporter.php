@@ -132,7 +132,7 @@ class RateImporter implements ShouldQueue
 
             // Log both headers and records
             // Log::channel('callvcal')->info('CSV Headers: ' . json_encode($headers));
-            // Log::channel('callvcal')->info('CSV Records: ' . json_encode($records));
+            Log::channel('callvcal')->info('CSV Records: ' . count($records));
 
             // Success message
         } catch (\Exception $e) {
