@@ -7,7 +7,6 @@ use App\Models\RateList;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Http\Request;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
@@ -35,125 +34,112 @@ class RateImporter implements ShouldQueue
         $this->shifts = $shifts;
     }
 
+    /**
+     * Execute the job.
+     */
     public function handle()
     {
-        $location_type = $this->location_type;
-        $locations = $this->locations ?? [];
-        $types = $this->types;
-        $shifts = $this->shifts;
-        $path = $this->path;
-
-        // Check if the file is uploaded
         try {
-            // Log::channel('callvcal')->info('CSV processing : locations' . json_encode($locations));
-            $csv = Reader::createFromPath($path, 'r');
+            $location_type = $this->location_type;
+            $locations = $this->getLocations($location_type);
+            $types = $this->types;
+            $shifts = $this->shifts;
 
-            // Set the header offset to 0 (indicating the first row contains headers)
+            $csv = Reader::createFromPath($this->path, 'r');
             $csv->setHeaderOffset(0);
 
-            // Get the headers (keys)
+            // Retrieve headers and records
             $headers = $csv->getHeader();
-            // Log::info('CSV Headers: ' . json_encode($headers));
+            $records = iterator_to_array($csv->getRecords(), false);
 
-            // Initialize an array to store records (values)
-            $records = [];
+            // Filter and validate records
+            $filteredRecords = array_filter($records, fn($record) => !$this->isRecordEmpty($record));
+            Log::info('Total valid records: ' . count($filteredRecords));
 
-            // Loop through each record in the CSV
-            foreach ($csv->getRecords() as $record) {
-                // Skip empty records
-                if ($this->isRecordEmpty($record)) {
-                    continue;
-                }
+            // Process records in batches
+            $batchSize = 100; // Adjust based on your dataset
+            $chunks = array_chunk($filteredRecords, $batchSize);
 
-                // Append each non-empty record to the records array
-                $records[] = $record;
-            }
-            // $records are fats
-            Log::channel('callvcal')->info('CSV Records: ' .'started');
-            for ($h = 1; $h < count($headers); $h++) {
-                // Log::channel('callvcal')->info('h: ' . json_encode($h));
-                for ($r = 0; $r < count($records); $r++) {
-                    // Log::channel('callvcal')->info('r: ' . json_encode($r));
-                    $snf = $headers[$h];
-                    $fat = ($records[$r])[$headers[0]];
-                    $rate = ($records[$r])[$headers[$h]];
-
-                    if ($location_type == '0') {
-                        $locations = Location::all()->pluck('location_id', 'location_id');
-                    }
-                    foreach ($locations as $location) {
-                        if ($location != '' && $location != null) {
-                            // Log::channel('callvcal')->info('location: ' . json_encode($location));
-                            // foreach ($shifts as $shift) {
-                            //     Log::channel('callvcal')->info('shift: ' . json_encode($shift));
-                            //     foreach ($types as $type) {
-                            //         Log::channel('callvcal')->info('type: ' . json_encode($type));
-                            //         $search = [
-                            //             'snf' => $snf,
-                            //             'fat' => $fat,
-                            //             'location_id' => $location,
-                            //             'shift' => $shift,
-                            //             'type' => $type,
-                            //         ];
-                            //         RateList::updateOrCreate(
-                            //             $search,
-                            //             [
-                            //                 'rate' => $rate
-                            //             ]
-                            //         );
-                            //         Log::channel('callvcal')->info('search: ' . json_encode($search));
-                            //     }
-                            // }
-
-
-
-                            foreach ($shifts as $shift) {
-                                $search = [
-                                    'snf' => $snf,
-                                    'fat' => $fat,
-                                    'location_id' => $location,
-                                    'shift' => $shift,
-
-                                ];
-                                $model = RateList::updateOrCreate(
-                                    $search,
-                                    [
-                                        'rate' => $rate
-                                    ]
-                                );
-                                foreach ($types as $type) {
-                                    $model->{$type} = $rate;
-                                }
-                                $model->save();
-                            }
-                        }
-                    }
-                }
+            foreach ($chunks as $chunk) {
+                $this->processChunk($chunk, $headers, $locations, $types, $shifts);
             }
 
-            // Log both headers and records
-            // Log::channel('callvcal')->info('CSV Headers: ' . json_encode($headers));
-            Log::channel('callvcal')->info('CSV Records: ' . count($records));
-
-            // Success message
+            Log::info('RateImporter completed successfully.');
         } catch (\Exception $e) {
-            // Handle exceptions
-            Log::error('CSV processing failed: ' . $e->getMessage());
+            Log::error('RateImporter failed: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Process a chunk of records.
+     */
+    private function processChunk($chunk, $headers, $locations, $types, $shifts)
+    {
+        $data = [];
+        foreach ($chunk as $record) {
+            for ($h = 1; $h < count($headers); $h++) {
+                $snf = $headers[$h];
+                $fat = $record[$headers[0]];
+                $rate = $record[$headers[$h]];
+
+                foreach ($locations as $location) {
+                    foreach ($shifts as $shift) {
+                        $row = [
+                            'snf' => $snf,
+                            'fat' => $fat,
+                            'location_id' => $location,
+                            'shift' => $shift,
+                            'rate' => $rate,
+                        ];
+
+                        foreach ($types as $type) {
+                            $row[$type] = $rate;
+                        }
+
+                        $data[] = $row;
+                    }
+                }
+            }
         }
 
-        return back();
+        // Use bulk insert or update
+        $this->bulkUpsert($data);
     }
+
+    /**
+     * Perform bulk upsert for rates.
+     */
+    private function bulkUpsert($data)
+    {
+        // Define unique keys for upsert
+        $uniqueKeys = ['snf', 'fat', 'location_id', 'shift'];
+
+        // Perform bulk upsert
+        RateList::upsert($data, $uniqueKeys, ['rate']);
+        Log::info('Processed a batch of ' . count($data) . ' rates.');
+    }
+
+    /**
+     * Retrieve locations based on location type.
+     */
+    private function getLocations($location_type)
+    {
+        if ($location_type == '0') {
+            return Location::all()->pluck('location_id')->toArray();
+        }
+        return $this->locations ?? [];
+    }
+
     /**
      * Helper function to check if a CSV record is empty.
-     * This function assumes the record is an associative array.
      */
     private function isRecordEmpty($record)
     {
         foreach ($record as $field) {
             if (!empty(trim($field))) {
-                return false; // Found a non-empty field
+                return false;
             }
         }
-        return true; // All fields are empty
+        return true;
     }
 }
