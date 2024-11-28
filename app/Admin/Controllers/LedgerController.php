@@ -6,6 +6,7 @@ use App\Exports\LedgetExport;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\OrderController as ControllersOrderController;
 use App\Imports\LedgetImport;
+use App\Models\Location;
 use OpenAdmin\Admin\Controllers\AdminController;
 use OpenAdmin\Admin\Form;
 use OpenAdmin\Admin\Grid;
@@ -48,7 +49,11 @@ class LedgerController extends AdminController
 
             // Add a column filter
             $filter->equal('customer_id', __('Farmer'))->select(UserData::all()->pluck('last_name', 'user_id'));
-            $filter->date('order_date_time', __('Order Date'));
+            // $filter->date('order_date_time', __('Order Date'));
+            if (isAdmin()) {
+                $filter->equal('location_id', "VSP")->select(Location::all()->pluck('name', 'location_id'));
+            } 
+            $filter->between('order_date_time', 'Collection Date')->date();
 
             //... additional filter options
         });
