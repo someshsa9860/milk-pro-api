@@ -405,7 +405,8 @@ class OrderController extends Controller
 
         return $fileName;
         // Return the file for download
-        return response()->download($fileName)->deleteFileAfterSend(true);
+        return response()->download($fileName);
+        // return response()->download($fileName)->deleteFileAfterSend(true);
     }
 
 
