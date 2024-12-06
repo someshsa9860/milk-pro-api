@@ -160,42 +160,65 @@ class OrderController extends Controller
 
         $orders = $query->get();
 
-        // If customer_id is null, group by customer_id and sum values
+        // If customer_id is null, group by customer_id and calculate sums
         if (is_null($customer_id)) {
             $orders = $orders->groupBy('customer_id')->map(function ($group) {
+                $total_litres = $group->sum(fn ($order) => $order->cow_litres + $order->buffalo_litres + $order->mixed_litres);
+                $total_amount = $group->sum(fn ($order) => $order->cow_amt + $order->buffalo_amt + $order->mixed_amt);
+                $total_advance = $group->sum('advance');
+                $total_payment = $group->sum('payment');
+                $closing_balance = $total_amount - $total_payment - $total_advance;
+
                 return [
-                    'customer' => $group->first()->customer->last_name ?? 'N/A',
-                    'location_id' => $group->first()->location_id ?? 'N/A',
-                    'total_litres' => $group->sum(fn ($order) => $order->cow_litres + $order->buffalo_litres + $order->mixed_litres),
-                    'total_fat' => $group->sum(fn ($order) => $order->cow_fat + $order->buffalo_fat + $order->mixed_fat),
-                    'total_clr' => $group->sum(fn ($order) => $order->cow_clr + $order->buffalo_clr + $order->mixed_clr),
-                    'total_snf' => $group->sum(fn ($order) => $order->cow_snf + $order->buffalo_snf + $order->mixed_snf),
-                    'total_advance' => $group->sum('advance'),
-                    'total_payment' => $group->sum('payment'),
-                    'total_amount' => $group->sum(fn ($order) => $order->cow_amt + $order->buffalo_amt + $order->mixed_amt),
+                    'VSP' => $group->first()->location_id ?? 'N/A',
+                    'Member' => $group->first()->customer->last_name ?? 'N/A',
+                    'Date' => $from . ' to ' . $to,
+                    'Shift' => 'Morning & Evening',
+                    'Type' => 'Cow & Buffalo',
+                    'Qty(ltr)' => $total_litres,
+                    'Avg Fat' => round($group->avg(fn ($order) => $order->cow_fat + $order->buffalo_fat + $order->mixed_fat), 2),
+                    'Avg SNF' => round($group->avg(fn ($order) => $order->cow_snf + $order->buffalo_snf + $order->mixed_snf), 2),
+                    'LR' => 0, // Placeholder for LR, update if available
+                    'Rate' => round($total_amount / max(1, $total_litres), 2), // Average rate per litre
+                    'Total Amount' => $total_amount,
+                    'Balance' => $total_amount - $total_payment,
+                    'Advance' => $total_advance,
+                    'G.Total Amount' => $total_amount,
+                    'Paid Amount' => $total_payment,
+                    'Closing Balance' => $closing_balance,
+                    'Remark' => 'N/A', // Placeholder for remarks
                 ];
             });
         }
 
         // Define headers
         $headers = [
-            'Customer', 'Location ID', 'Total Litres', 'Total Fat', 'Total CLR', 'Total SNF',
-            'Total Advance', 'Total Payment', 'Total Amount',
+            'VSP', 'Member', 'Date', 'Shift', 'Type', 'Qty(ltr)', 'Avg Fat', 'Avg SNF',
+            'LR', 'Rate', 'Total Amount', 'Balance', 'Advance', 'G.Total Amount',
+            'Paid Amount', 'Closing Balance', 'Remark',
         ];
 
         // Prepare data rows
         $orderData = [];
         foreach ($orders as $order) {
             $orderData[] = [
-                $order['customer'],
-                $order['location_id'],
-                $order['total_litres'],
-                $order['total_fat'],
-                $order['total_clr'],
-                $order['total_snf'],
-                $order['total_advance'],
-                $order['total_payment'],
-                $order['total_amount'],
+                $order['VSP'],
+                $order['Member'],
+                $order['Date'],
+                $order['Shift'],
+                $order['Type'],
+                $order['Qty(ltr)'],
+                $order['Avg Fat'],
+                $order['Avg SNF'],
+                $order['LR'],
+                $order['Rate'],
+                $order['Total Amount'],
+                $order['Balance'],
+                $order['Advance'],
+                $order['G.Total Amount'],
+                $order['Paid Amount'],
+                $order['Closing Balance'],
+                $order['Remark'],
             ];
         }
 
@@ -233,6 +256,7 @@ class OrderController extends Controller
 
         return $fileName;
     }
+
 
     public function  export($from, $to, $customer_id, $location_id)
     {
