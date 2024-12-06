@@ -131,6 +131,7 @@ class OrderController extends Controller
     {
         $from = request()->query('from');
         $to = request()->query('to');
+        $debug = request()->query('debug')??false;
         $customer_id = request()->query('customer_id');
         $location_id = auth()->user()->location_id;
 
@@ -140,7 +141,7 @@ class OrderController extends Controller
             $filePath = public_path($this->exportAll($from, $to, $customer_id, $location_id));
         }
 
-        return response()->download($filePath)->deleteFileAfterSend(true);
+        return response()->download($filePath)->deleteFileAfterSend($debug);
     }
     public function exportAll($from, $to, $customer_id, $location_id)
     {
@@ -404,9 +405,6 @@ class OrderController extends Controller
         $writer->save($filePath);
 
         return $fileName;
-        // Return the file for download
-        return response()->download($fileName);
-        // return response()->download($fileName)->deleteFileAfterSend(true);
     }
 
 
