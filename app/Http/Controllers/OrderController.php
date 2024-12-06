@@ -162,7 +162,7 @@ class OrderController extends Controller
 
         // If customer_id is null, group by customer_id and calculate sums
         if (is_null($customer_id)) {
-            $orders = $orders->groupBy('customer_id')->map(function ($group) {
+            $orders = $orders->groupBy('customer_id')->map(function ($group) use($from,$to) {
                 $total_litres = $group->sum(fn ($order) => $order->cow_litres + $order->buffalo_litres + $order->mixed_litres);
                 $total_amount = $group->sum(fn ($order) => $order->cow_amt + $order->buffalo_amt + $order->mixed_amt);
                 $total_advance = $group->sum('advance');
