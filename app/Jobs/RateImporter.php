@@ -93,7 +93,7 @@ class RateImporter implements ShouldQueue
                             $row = [
                                 'snf' => (float)$snf,
                                 'fat' => (float)$fat,
-                                'location_id' => (int)$location,
+                                'location_id' => $location,
                                 'shift' => (string)$shift,
                                 'rate' => (float)$rate,
                             ];
