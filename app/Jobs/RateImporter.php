@@ -57,7 +57,7 @@ class RateImporter implements ShouldQueue
             Log::info('Total valid records: ' . count($filteredRecords));
 
             // Process records in small chunks
-            $chunkSize = 100; // Define a manageable chunk size
+            $chunkSize = 10; // Define a manageable chunk size
             $chunks = array_chunk($filteredRecords, $chunkSize);
 
             foreach ($chunks as $index => $chunk) {
