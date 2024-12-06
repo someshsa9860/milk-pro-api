@@ -141,7 +141,7 @@ class OrderController extends Controller
             $filePath = public_path($this->exportAll($from, $to, $customer_id, $location_id));
         }
 
-        return response()->download($filePath)->deleteFileAfterSend($debug);
+        return response()->download($filePath)->deleteFileAfterSend($debug!='true');
     }
     public function exportAll($from, $to, $customer_id, $location_id)
     {
