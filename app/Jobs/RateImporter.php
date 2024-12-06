@@ -56,17 +56,20 @@ class RateImporter implements ShouldQueue
             $filteredRecords = array_filter($records, fn($record) => !$this->isRecordEmpty($record));
             Log::info('Total valid records: ' . count($filteredRecords));
 
-            // Process records in batches
-            $batchSize = 100; // Adjust based on your dataset
-            $chunks = array_chunk($filteredRecords, $batchSize);
+            // Process records in small chunks
+            $chunkSize = 100; // Define a manageable chunk size
+            $chunks = array_chunk($filteredRecords, $chunkSize);
 
-            foreach ($chunks as $chunk) {
+            foreach ($chunks as $index => $chunk) {
+                Log::info("Processing chunk " . ($index + 1) . " of " . count($chunks) . ".");
                 $this->processChunk($chunk, $headers, $locations, $types, $shifts);
             }
 
             Log::info('RateImporter completed successfully.');
         } catch (\Exception $e) {
-            Log::error('RateImporter failed: ' . $e->getMessage());
+            Log::error('RateImporter failed: ' . $e->getMessage(), [
+                'exception' => $e,
+            ]);
         }
     }
 
@@ -76,34 +79,50 @@ class RateImporter implements ShouldQueue
     private function processChunk($chunk, $headers, $locations, $types, $shifts)
     {
         $data = [];
-        foreach ($chunk as $record) {
-            for ($h = 1; $h < count($headers); $h++) {
-                $snf = $headers[$h];
-                $fat = $record[$headers[0]];
-                $rate = $record[$headers[$h]];
+        $chunkSize = count($chunk);
 
-                foreach ($locations as $location) {
-                    foreach ($shifts as $shift) {
-                        $row = [
-                            'snf' => $snf,
-                            'fat' => $fat,
-                            'location_id' => $location,
-                            'shift' => $shift,
-                            'rate' => $rate,
-                        ];
+        try {
+            foreach ($chunk as $index => $record) {
+                for ($h = 1; $h < count($headers); $h++) {
+                    $snf = $headers[$h];
+                    $fat = $record[$headers[0]];
+                    $rate = $record[$headers[$h]];
 
-                        foreach ($types as $type) {
-                            $row[$type] = $rate;
+                    foreach ($locations as $location) {
+                        foreach ($shifts as $shift) {
+                            $row = [
+                                'snf' => (float)$snf,
+                                'fat' => (float)$fat,
+                                'location_id' => (int)$location,
+                                'shift' => (string)$shift,
+                                'rate' => (float)$rate,
+                            ];
+
+                            foreach ($types as $type) {
+                                $row[$type] = (float)$rate;
+                            }
+
+                            $data[] = $row;
                         }
-
-                        $data[] = $row;
                     }
                 }
-            }
-        }
 
-        // Use bulk insert or update
-        $this->bulkUpsert($data);
+                // Log progress within chunk
+                if ($index % 10 === 0) {
+                    Log::info("Processed record {$index}/{$chunkSize} in current chunk.");
+                }
+            }
+
+            // Use bulk insert or update
+            $this->bulkUpsert($data);
+
+            Log::info("Successfully processed a chunk of {$chunkSize} records.");
+        } catch (\Throwable $e) {
+            Log::error("Error processing chunk: {$e->getMessage()}", [
+                'exception' => $e,
+                'chunk' => $chunk,
+            ]);
+        }
     }
 
     /**
@@ -111,12 +130,10 @@ class RateImporter implements ShouldQueue
      */
     private function bulkUpsert($data)
     {
-        // Define unique keys for upsert
         $uniqueKeys = ['snf', 'fat', 'location_id', 'shift'];
 
-        // Perform bulk upsert
         RateList::upsert($data, $uniqueKeys, ['rate']);
-        Log::info('Processed a batch of ' . count($data) . ' rates.');
+        Log::info('Bulk upserted ' . count($data) . ' records.');
     }
 
     /**
