@@ -11,6 +11,7 @@ use App\Models\User;
 use App\Models\UserData;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Facades\Excel;
 use OpenAdmin\Admin\Facades\Admin;
 use OpenAdmin\Admin\Layout\Content;
@@ -169,6 +170,7 @@ class OrderController extends Controller
         }
 
         $orders = $query->get();
+        Log::channel('callvcal')->info('exportAll:'.json_encode($orders));
 
         // If customer_id is null, group by customer_id and calculate sums
         if (is_null($customer_id)) {
