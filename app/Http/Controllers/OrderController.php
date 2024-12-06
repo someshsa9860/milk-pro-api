@@ -134,52 +134,55 @@ class OrderController extends Controller
         $customer_id = request()->query('customer_id');
         $location_id = auth()->user()->location_id;
 
-        $filePath= public_path($this->export($from,$to,$customer_id,$location_id)) ;
+        if (isset($customer_id) && ($customer_id != null)) {
+            $filePath = public_path($this->export($from, $to, $customer_id, $location_id));
+        } else {
+            $filePath = public_path($this->exportAll($from, $to, $customer_id, $location_id));
+        }
+
         return response()->download($filePath)->deleteFileAfterSend(true);
     }
-    public function export($from, $to, $customer_id, $location_id)
+    public function exportAll($from, $to, $customer_id, $location_id)
     {
         // Fetch the orders
         $query = Order::with('customer');
-    
+
         if (isset($location_id)) {
             $query = $query->where('location_id', $location_id);
         }
-        if (isset($customer_id)&&($customer_id!=null)) {
-            $query = $query->where('customer_id', $customer_id);
-        }
+
         if (isset($from)) {
             $query = $query->where('order_date_time', '>=', $from);
         }
         if (isset($to)) {
             $query = $query->where('order_date_time', '<=', $to);
         }
-    
+
         $orders = $query->get();
-    
+
         // If customer_id is null, group by customer_id and sum values
         if (is_null($customer_id)) {
             $orders = $orders->groupBy('customer_id')->map(function ($group) {
                 return [
                     'customer' => $group->first()->customer->last_name ?? 'N/A',
                     'location_id' => $group->first()->location_id ?? 'N/A',
-                    'total_litres' => $group->sum(fn($order) => $order->cow_litres + $order->buffalo_litres + $order->mixed_litres),
-                    'total_fat' => $group->sum(fn($order) => $order->cow_fat + $order->buffalo_fat + $order->mixed_fat),
-                    'total_clr' => $group->sum(fn($order) => $order->cow_clr + $order->buffalo_clr + $order->mixed_clr),
-                    'total_snf' => $group->sum(fn($order) => $order->cow_snf + $order->buffalo_snf + $order->mixed_snf),
+                    'total_litres' => $group->sum(fn ($order) => $order->cow_litres + $order->buffalo_litres + $order->mixed_litres),
+                    'total_fat' => $group->sum(fn ($order) => $order->cow_fat + $order->buffalo_fat + $order->mixed_fat),
+                    'total_clr' => $group->sum(fn ($order) => $order->cow_clr + $order->buffalo_clr + $order->mixed_clr),
+                    'total_snf' => $group->sum(fn ($order) => $order->cow_snf + $order->buffalo_snf + $order->mixed_snf),
                     'total_advance' => $group->sum('advance'),
                     'total_payment' => $group->sum('payment'),
-                    'total_amount' => $group->sum(fn($order) => $order->cow_amt + $order->buffalo_amt + $order->mixed_amt),
+                    'total_amount' => $group->sum(fn ($order) => $order->cow_amt + $order->buffalo_amt + $order->mixed_amt),
                 ];
             });
         }
-    
+
         // Define headers
         $headers = [
-            'Customer', 'Location ID', 'Total Litres', 'Total Fat', 'Total CLR', 'Total SNF', 
+            'Customer', 'Location ID', 'Total Litres', 'Total Fat', 'Total CLR', 'Total SNF',
             'Total Advance', 'Total Payment', 'Total Amount',
         ];
-    
+
         // Prepare data rows
         $orderData = [];
         foreach ($orders as $order) {
@@ -195,18 +198,18 @@ class OrderController extends Controller
                 $order['total_amount'],
             ];
         }
-    
+
         // Create a new spreadsheet
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
-    
+
         // Add headers to the first row
         $columnIndex = 'A';
         foreach ($headers as $header) {
             $sheet->setCellValue($columnIndex . '1', $header);
             $columnIndex++;
         }
-    
+
         // Add order data to the spreadsheet
         $row = 2; // Start from the second row
         foreach ($orderData as $data) {
@@ -217,21 +220,22 @@ class OrderController extends Controller
             }
             $row++;
         }
-    
+
         // Save the Excel file
         $fileName = 'reports/ledger_report_' . now()->format('Y_m_d_H_i_s') . '.xlsx';
-    
+
         $writer = new Xlsx($spreadsheet);
         $filePath = public_path($fileName);
         if (!file_exists(public_path('reports'))) {
             mkdir(public_path('reports'));
         }
         $writer->save($filePath);
-    
+
         return $fileName;
     }
-    
-    public function  exportV1($from,$to,$customer_id,$location_id){
+
+    public function  export($from, $to, $customer_id, $location_id)
+    {
         // Fetch the orders
         $query = Order::with('customer');
 
@@ -367,10 +371,10 @@ class OrderController extends Controller
         // Save the Excel file
         $fileName = 'reports/ledger_report_' . now()->format('Y_m_d_H_i_s') . '.xlsx';
 
- 
+
         $writer = new Xlsx($spreadsheet);
         $filePath = public_path($fileName);
-        if(!file_exists(public_path('reports'))){
+        if (!file_exists(public_path('reports'))) {
             mkdir(public_path('reports'));
         }
         $writer->save($filePath);
