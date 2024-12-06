@@ -131,18 +131,27 @@ class OrderController extends Controller
     {
         $from = request()->query('from');
         $to = request()->query('to');
-        $debug = request()->query('debug')??false;
+        $debug = request()->query('debug')??'false';
         $customer_id = request()->query('customer_id');
         $location_id = auth()->user()->location_id;
 
-        if (isset($customer_id) && ($customer_id != null)) {
-            $filePath = public_path($this->export($from, $to, $customer_id, $location_id));
-        } else {
-            $filePath = public_path($this->exportAll($from, $to, $customer_id, $location_id));
-        }
+        $filePath =public_path($this->exportLedger($from, $to, $customer_id, $location_id));
+
 
         return response()->download($filePath)->deleteFileAfterSend($debug!='true');
     }
+    public function exportLedger($from, $to, $customer_id, $location_id)
+    {
+    
+        if (isset($customer_id) && ($customer_id != null)) {
+            $filePath =  ($this->export($from, $to, $customer_id, $location_id));
+        } else {
+            $filePath =  ($this->exportAll($from, $to, $customer_id, $location_id));
+        }
+
+        return $filePath;
+    }
+
     public function exportAll($from, $to, $customer_id, $location_id)
     {
         // Fetch the orders

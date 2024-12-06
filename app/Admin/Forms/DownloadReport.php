@@ -33,7 +33,7 @@ class DownloadReport extends Form
      */
     public function handle(Request $request)
     {
-        $filePath = (new ControllersOrderController())->export($request->from, $request->to, $request->customer_id, $request->location_id);
+        $filePath = (new ControllersOrderController())->exportLedger($request->from, $request->to, $request->customer_id, $request->location_id);
 
         $fileName = ($filePath);
         $downloadUrl = url($fileName);

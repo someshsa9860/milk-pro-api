@@ -64,3 +64,4 @@ Route::get('/download-report/{file}', function ($file) {
         return abort(404, 'File not found');
     }
 });
+
