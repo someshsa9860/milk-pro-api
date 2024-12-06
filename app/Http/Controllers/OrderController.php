@@ -144,7 +144,7 @@ class OrderController extends Controller
     public function exportLedger($from, $to, $customer_id, $location_id)
     {
     
-        if (isset($customer_id) && ($customer_id != null)) {
+        if (isset($customer_id) && ($customer_id != null)&& ($customer_id != 'null')) {
             $filePath =  ($this->export($from, $to, $customer_id, $location_id));
         } else {
             $filePath =  ($this->exportAll($from, $to, $customer_id, $location_id));
