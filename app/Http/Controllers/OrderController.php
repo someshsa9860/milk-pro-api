@@ -355,7 +355,7 @@ class OrderController extends Controller
                 $totalPayment += $order->payment;
                 $count++;
                 $avgFat+=$order->cow_fat;
-                $avgSNF+=$order->snf_fat;
+                $avgSNF+=$order->snf_snf;
                 $totalLitres+=$order->cow_litres;
             }
 
@@ -411,7 +411,7 @@ class OrderController extends Controller
                 $totalPayment += $order->payment;
                 $count++;
                 $avgFat+=$order->mixed_fat;
-                $avgSNF+=$order->mixed_clr;
+                $avgSNF+=$order->mixed_snf;
                 $totalLitres+=$order->mixed_litres;
             }
             if ($order->payment > 0) {
@@ -468,7 +468,7 @@ class OrderController extends Controller
 
         $sheet->setCellValue('F' . $row, $totalLitres); // Total Amount
         $sheet->setCellValue('G' . $row, round(($avgFat)/($count),2)); // Total Amount
-        $sheet->setCellValue('H' . $row, round($avgSNF/$count,2)); // Total Amount
+        $sheet->setCellValue('I' . $row, round($avgSNF/$count,2)); // Total Amount
         // Save the Excel file
         $fileName = 'reports/ledger_report_' . now()->format('Y_m_d_H_i_s') . '.xlsx';
 
