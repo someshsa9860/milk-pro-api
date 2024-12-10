@@ -310,7 +310,7 @@ class OrderController extends Controller
             $query = $query->where('order_date_time', '<=', $to);
         }
         $orders = $query->get();
-        Log::channel('callvcal')->info('export:'.json_encode($orders));
+        // Log::channel('callvcal')->info('export:'.json_encode($orders));
 
         // Define headers
         $headers = [
