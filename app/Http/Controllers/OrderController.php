@@ -314,14 +314,19 @@ class OrderController extends Controller
 
         // Define headers
         $headers = [
-            'VSP', 'Member', 'Date', 'Shift', 'Type', 'Litres', 'Fat', 'CLR', 'SNF', 'Rate', 'Amount', 'Total', 'Remark', 'Advance', 'Payment',
+            'VSP', 'Member', 'Date', 'Shift', 'Type', 'Litres', 'Fat', 'CLR', 'SNF', 'Rate', 'Amount',  'Remark', 'Advance', 'Payment',
         ];
 
         // Initialize total counters
         $totalAmount = 0;
         $totalAdvance = 0;
         $totalPayment = 0;
-
+        $count=0;
+        $avgFat=0;
+        $avgSNF=0;
+        $totalLitres=0;
+       
+        
         // Prepare data rows
         $orderData = [];
         foreach ($orders as $order) {
@@ -340,7 +345,7 @@ class OrderController extends Controller
                     $order->cow_snf,
                     $order->cow_rate,
                     $order->cow_amt,
-                    $order->total,
+                     
                     $order->remark,
                     $order->advance,
                     $order->payment,
@@ -348,6 +353,10 @@ class OrderController extends Controller
                 $totalAmount += $order->cow_amt;
                 $totalAdvance += $order->advance;
                 $totalPayment += $order->payment;
+                $count++;
+                $avgFat+=$order->cow_fat;
+                $avgSNF+=$order->snf_fat;
+                $totalLitres+=$order->cow_litres;
             }
 
             // Add buffalo details if amount > 0
@@ -364,7 +373,7 @@ class OrderController extends Controller
                     $order->buffalo_snf,
                     $order->buffalo_rate,
                     $order->buffalo_amt,
-                    $order->total,
+                    
                     $order->remark,
                     $order->advance,
                     $order->payment,
@@ -372,6 +381,10 @@ class OrderController extends Controller
                 $totalAmount += $order->buffalo_amt;
                 $totalAdvance += $order->advance;
                 $totalPayment += $order->payment;
+                $count++;
+                $avgFat+=$order->buffalo_fat;
+                $avgSNF+=$order->buffalo_snf;
+                $totalLitres+=$order->buffalo_litres;
             }
 
             // Add mixed details if amount > 0
@@ -388,7 +401,7 @@ class OrderController extends Controller
                     $order->mixed_snf,
                     $order->mixed_rate,
                     $order->mixed_amt,
-                    $order->total,
+                    
                     $order->remark,
                     $order->advance,
                     $order->payment,
@@ -396,6 +409,10 @@ class OrderController extends Controller
                 $totalAmount += $order->mixed_amt;
                 $totalAdvance += $order->advance;
                 $totalPayment += $order->payment;
+                $count++;
+                $avgFat+=$order->mixed_fat;
+                $avgSNF+=$order->mixed_clr;
+                $totalLitres+=$order->mixed_litres;
             }
             if ($order->payment > 0) {
                 $orderData[] = [
@@ -410,10 +427,10 @@ class OrderController extends Controller
                     '',
                     '',
                     '',
-                    '',
+                    
                     $order->remark,
-                    $order->advance,
                     '',
+                    $order->payment,
                 ];
                 
                 $totalPayment += $order->payment;
@@ -449,6 +466,9 @@ class OrderController extends Controller
         $sheet->setCellValue('M' . $row, $totalAdvance); // Total Advance
         $sheet->setCellValue('N' . $row, $totalPayment); // Total Payment
 
+        $sheet->setCellValue('F' . $row, $totalLitres); // Total Amount
+        $sheet->setCellValue('G' . $row, round(($avgFat)/($count),2)); // Total Amount
+        $sheet->setCellValue('H' . $row, round($avgSNF/$count,2)); // Total Amount
         // Save the Excel file
         $fileName = 'reports/ledger_report_' . now()->format('Y_m_d_H_i_s') . '.xlsx';
 
