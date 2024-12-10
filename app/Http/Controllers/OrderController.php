@@ -355,7 +355,7 @@ class OrderController extends Controller
                 $totalPayment += $order->payment;
                 $count++;
                 $avgFat+=$order->cow_fat;
-                $avgSNF+=$order->snf_snf;
+                $avgSNF+=$order->cow_snf;
                 $totalLitres+=$order->cow_litres;
             }
 
