@@ -170,49 +170,66 @@ class OrderController extends Controller
         }
 
         $orders = $query->get();
-        Log::channel('callvcal')->info('exportAll:'.json_encode($orders));
+        $ordersArrayData = [];
 
+        $avgFat=0;
+        $avgSNF=0;
+        $totalLitres=0;
+        $totalAmount=0;
+        $totalAdvance=0;
+        $totalPayment=0;
         // If customer_id is null, group by customer_id and calculate sums
         if (is_null($customer_id)) {
-            $orders = $orders->groupBy('customer_id')->map(function ($group) use($from,$to) {
+            $orders = $orders->groupBy('customer_id');
+
+            foreach ($orders as $customer_id => $group) {
                 $total_litres = $group->sum(fn ($order) => $order->cow_litres + $order->buffalo_litres + $order->mixed_litres);
                 $total_amount = $group->sum(fn ($order) => $order->cow_amt + $order->buffalo_amt + $order->mixed_amt);
                 $total_advance = $group->sum('advance');
                 $total_payment = $group->sum('payment');
-                $closing_balance = $total_amount - $total_payment - $total_advance;
+            
+                $totalAmount += $total_amount;
+                $totalLitres += $total_litres;
+                $totalAdvance += $total_advance;
+                $totalPayment += $total_payment;
+                $avg_fat=round($group->avg(fn ($order) => $order->cow_fat + $order->buffalo_fat + $order->mixed_fat), 2);
+                $avg_snf=round($group->avg(fn ($order) => $order->cow_snf + $order->buffalo_snf + $order->mixed_snf), 2);
+                $avgFat += $avg_fat;
+                $avgSNF += $avg_snf;
+            
 
-                return [
+                $ordersArrayData[] = [
                     'VSP' => $group->first()->location_id ?? 'N/A',
                     'Member' => $group->first()->customer->last_name ?? 'N/A',
                     'Date' => $from . ' to ' . $to,
                     'Shift' => 'Morning & Evening',
                     'Type' => 'Cow & Buffalo',
                     'Qty(ltr)' => $total_litres,
-                    'Avg Fat' => round($group->avg(fn ($order) => $order->cow_fat + $order->buffalo_fat + $order->mixed_fat), 2),
-                    'Avg SNF' => round($group->avg(fn ($order) => $order->cow_snf + $order->buffalo_snf + $order->mixed_snf), 2),
-                    'LR' => 0, // Placeholder for LR, update if available
+                    'Avg Fat' => $avg_fat,
+                    'Avg SNF' => $avg_snf,
+                    
                     'Rate' => round($total_amount / max(1, $total_litres), 2), // Average rate per litre
-                    'Total Amount' => $total_amount,
-                    'Balance' => $total_amount - $total_payment,
+                    'Amount' => $total_amount,
+                     
                     'Advance' => $total_advance,
-                    'G.Total Amount' => $total_amount,
-                    'Paid Amount' => $total_payment,
-                    'Closing Balance' => $closing_balance,
+                    'Payment' => $total_payment,
+                    
+                   
                     'Remark' => 'N/A', // Placeholder for remarks
                 ];
-            });
+            }
         }
 
         // Define headers
         $headers = [
             'VSP', 'Member', 'Date', 'Shift', 'Type', 'Qty(ltr)', 'Avg Fat', 'Avg SNF',
-            'LR', 'Rate', 'Total Amount', 'Balance', 'Advance', 'G.Total Amount',
-            'Paid Amount', 'Closing Balance', 'Remark',
+              'Rate', 'Amount', 'Advance',  
+            'Payment',  'Remark',
         ];
 
         // Prepare data rows
         $orderData = [];
-        foreach ($orders as $order) {
+        foreach ($ordersArrayData as $order) {
             $orderData[] = [
                 $order['VSP'],
                 $order['Member'],
@@ -222,14 +239,11 @@ class OrderController extends Controller
                 $order['Qty(ltr)'],
                 $order['Avg Fat'],
                 $order['Avg SNF'],
-                $order['LR'],
+                
                 $order['Rate'],
-                $order['Total Amount'],
-                $order['Balance'],
+                $order['Amount'],
                 $order['Advance'],
-                $order['G.Total Amount'],
-                $order['Paid Amount'],
-                $order['Closing Balance'],
+                $order['Payment'],
                 $order['Remark'],
             ];
         }
@@ -256,6 +270,14 @@ class OrderController extends Controller
             $row++;
         }
 
+        $sheet->setCellValue('A' . $row, 'Totals');
+        $sheet->mergeCells('A' . $row . ':E' . $row); // Merge for better display
+        $sheet->setCellValue('F' . $row, $totalLitres); // Total Amount
+        $sheet->setCellValue('G' . $row, round(($avgFat)/(count($orderData)),2)); // Total Amount
+        $sheet->setCellValue('H' . $row, round($avgSNF/count($orderData),2)); // Total Amount
+        $sheet->setCellValue('J' . $row, $totalAmount); // Total Amount
+        $sheet->setCellValue('K' . $row, $totalAdvance); // Total Advance
+        $sheet->setCellValue('L' . $row, $totalPayment); // Total Payment
         // Save the Excel file
         $fileName = 'reports/ledger_report_' . now()->format('Y_m_d_H_i_s') . '.xlsx';
 
