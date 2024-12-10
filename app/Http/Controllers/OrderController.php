@@ -325,6 +325,7 @@ class OrderController extends Controller
         // Prepare data rows
         $orderData = [];
         foreach ($orders as $order) {
+
             // Add cow details if amount > 0
             if ($order->cow_amt > 0) {
                 $orderData[] = [
@@ -394,6 +395,27 @@ class OrderController extends Controller
                 ];
                 $totalAmount += $order->mixed_amt;
                 $totalAdvance += $order->advance;
+                $totalPayment += $order->payment;
+            }
+            if ($order->payment > 0) {
+                $orderData[] = [
+                    $order->location_id ?? 'N/A',
+                    $order->customer->last_name ?? 'N/A',
+                    $order->order_date_time,
+                    '-',
+                    '-',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    $order->remark,
+                    $order->advance,
+                    '',
+                ];
+                
                 $totalPayment += $order->payment;
             }
         }
