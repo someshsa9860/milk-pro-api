@@ -196,7 +196,8 @@ class OrderController extends Controller
                 $avg_snf=round($group->avg(fn ($order) => $order->cow_snf + $order->buffalo_snf + $order->mixed_snf), 2);
                 $avgFat += $avg_fat;
                 $avgSNF += $avg_snf;
-            
+                $closing_balance = $total_amount - $total_payment - $total_advance;
+
 
                 $ordersArrayData[] = [
                     'VSP' => $group->first()->location_id ?? 'N/A',
@@ -214,17 +215,28 @@ class OrderController extends Controller
                     'Advance' => $total_advance,
                     'Payment' => $total_payment,
                     
+                    'closing_balance'=>$closing_balance,
                    
-                    'Remark' => 'N/A', // Placeholder for remarks
+                   
+                    'balance' => $total_amount - $total_payment,
+                   
+                    'T_Amount' => $total_amount,
+                    
+                   
+
+
+                    'Remark' => '', // Placeholder for remarks
                 ];
             }
         }
 
         // Define headers
         $headers = [
-            'VSP', 'Member', 'Date', 'Shift', 'Type', 'Qty(ltr)', 'Avg Fat', 'Avg SNF',
-              'Rate', 'Amount', 'Advance',  
-            'Payment',  'Remark',
+            'VSP', 'Member', 'Date', 'Shift', 'Type', 'Qty(ltr)', 'Avg Fat', 
+            'Avg SNF',
+            "LR",
+              'Rate', 'Total Amount',"Balance", 'Advance',  "G. Total Amount",
+            'Paid Amount', "Closing Balance", 'Remark',
         ];
 
         // Prepare data rows
@@ -239,11 +251,15 @@ class OrderController extends Controller
                 $order['Qty(ltr)'],
                 $order['Avg Fat'],
                 $order['Avg SNF'],
-                
+                0,
                 $order['Rate'],
                 $order['Amount'],
+                $order['balance'],
+
                 $order['Advance'],
+                $order['T_Amount'],
                 $order['Payment'],
+                $order['closing_balance'],
                 $order['Remark'],
             ];
         }
@@ -270,14 +286,14 @@ class OrderController extends Controller
             $row++;
         }
 
-        $sheet->setCellValue('A' . $row, 'Totals');
+        $sheet->setCellValue('E' . $row, 'Total');
         $sheet->mergeCells('A' . $row . ':E' . $row); // Merge for better display
         $sheet->setCellValue('F' . $row, $totalLitres); // Total Amount
         $sheet->setCellValue('G' . $row, round(($avgFat)/(count($orderData)),2)); // Total Amount
         $sheet->setCellValue('H' . $row, round($avgSNF/count($orderData),2)); // Total Amount
-        $sheet->setCellValue('J' . $row, $totalAmount); // Total Amount
-        $sheet->setCellValue('K' . $row, $totalAdvance); // Total Advance
-        $sheet->setCellValue('L' . $row, $totalPayment); // Total Payment
+        $sheet->setCellValue('K' . $row, $totalAmount); // Total Amount
+        $sheet->setCellValue('M' . $row, $totalAdvance); // Total Advance
+        $sheet->setCellValue('O' . $row, $totalPayment); // Total Payment
         // Save the Excel file
         $fileName = 'reports/ledger_report_' . now()->format('Y_m_d_H_i_s') . '.xlsx';
 
