@@ -385,9 +385,9 @@ class OrderController extends Controller
             }
             
         }
+        
 
-
-        $orders = $query->get();
+        $orders = $query->orderBy('order_date_time','ASC')->get();
         // Log::channel('callvcal')->info('export:'.json_encode($orders));
 
         // Define headers
