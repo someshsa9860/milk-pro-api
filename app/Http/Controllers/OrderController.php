@@ -169,12 +169,11 @@ class OrderController extends Controller
             $toTimestamp = strtotime($to);
         
             if ($fromTimestamp !== false && $toTimestamp !== false) {
+                $toEndOfDay = date('Y-m-d 23:59:59', $toTimestamp); // Append end of day time
                 $dRange = $from . ' to ' . $to;
-                $query = $query->whereBetween('order_date_time', [$from, $to]);
-            } else {
-                // Handle invalid dates, e.g., display an error message
-                echo "Invalid date range.";
-            }
+                $query = $query->whereBetween('order_date_time', [$from, $toEndOfDay]);
+            } 
+            
         } elseif (isset($from)) {
             // Validate date using strtotime
             $fromTimestamp = strtotime($from);
@@ -182,22 +181,20 @@ class OrderController extends Controller
             if ($fromTimestamp !== false) {
                 $dRange = $from;
                 $query = $query->whereDate('order_date_time', '>=', $from);
-            } else {
-                // Handle invalid date, e.g., display an error message
-                echo "Invalid from date.";
-            }
+            } 
+            
         } elseif (isset($to)) {
             // Validate date using strtotime
             $toTimestamp = strtotime($to);
         
             if ($toTimestamp !== false) {
+                $toEndOfDay = date('Y-m-d 23:59:59', $toTimestamp); // Append end of day time
                 $dRange = $to;
-                $query = $query->whereDate('order_date_time', '<=', $to);
-            } else {
-                // Handle invalid date, e.g., display an error message
-                echo "Invalid to date.";
-            }
+                $query = $query->where('order_date_time', '<=', $toEndOfDay);
+            } 
+            
         }
+        
 
 
         $orders = $query->get();
@@ -356,12 +353,40 @@ class OrderController extends Controller
         if (isset($customer_id)) {
             $query = $query->where('customer_id', $customer_id);
         }
-        if (isset($from)) {
-            $query = $query->where('order_date_time', '>=', $from);
+        $dRange = 'all';
+        if (isset($from) && isset($to)) {
+            // Validate dates using strtotime
+            $fromTimestamp = strtotime($from);
+            $toTimestamp = strtotime($to);
+        
+            if ($fromTimestamp !== false && $toTimestamp !== false) {
+                $toEndOfDay = date('Y-m-d 23:59:59', $toTimestamp); // Append end of day time
+                $dRange = $from . ' to ' . $to;
+                $query = $query->whereBetween('order_date_time', [$from, $toEndOfDay]);
+            }
+            
+        } elseif (isset($from)) {
+            // Validate date using strtotime
+            $fromTimestamp = strtotime($from);
+        
+            if ($fromTimestamp !== false) {
+                $dRange = $from;
+                $query = $query->whereDate('order_date_time', '>=', $from);
+            } 
+            
+        } elseif (isset($to)) {
+            // Validate date using strtotime
+            $toTimestamp = strtotime($to);
+        
+            if ($toTimestamp !== false) {
+                $toEndOfDay = date('Y-m-d 23:59:59', $toTimestamp); // Append end of day time
+                $dRange = $to;
+                $query = $query->where('order_date_time', '<=', $toEndOfDay);
+            }
+            
         }
-        if (isset($to)) {
-            $query = $query->where('order_date_time', '<=', $to);
-        }
+
+
         $orders = $query->get();
         // Log::channel('callvcal')->info('export:'.json_encode($orders));
 
