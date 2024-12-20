@@ -320,11 +320,14 @@ class OrderController extends Controller
             $row++;
         }
 
+        $count=count($orderData);
+        $count=max(1,$count);
+
         $sheet->setCellValue('E' . $row, 'Total');
         $sheet->mergeCells('A' . $row . ':E' . $row); // Merge for better display
         $sheet->setCellValue('F' . $row, $totalLitres); // Total Amount
-        $sheet->setCellValue('G' . $row, round(($avgFat) / (count($orderData)), 2)); // Total Amount
-        $sheet->setCellValue('H' . $row, round($avgSNF / count($orderData), 2)); // Total Amount
+        $sheet->setCellValue('G' . $row, round(($avgFat) / ($count), 2)); // Total Amount
+        $sheet->setCellValue('H' . $row, round($avgSNF / $count, 2)); // Total Amount
         $sheet->setCellValue('K' . $row, $totalAmount); // Total Amount
         $sheet->setCellValue('M' . $row, $totalAdvance); // Total Advance
         $sheet->setCellValue('O' . $row, $totalPayment); // Total Payment
