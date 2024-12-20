@@ -537,7 +537,7 @@ class OrderController extends Controller
             $row++;
         }
 
-        $count=max(0,$count);
+        $count=max(1,$count);
         // Add summation rows
         $sheet->setCellValue('A' . $row, 'Totals');
         $sheet->mergeCells('A' . $row . ':E' . $row); // Merge for better display
