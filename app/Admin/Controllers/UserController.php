@@ -83,7 +83,28 @@ class UserController extends AdminController
         })->label();
         $show->field('created_at', trans('admin.created_at'));
         $show->field('updated_at', trans('admin.updated_at'));
+        $show->users('Devices', function ($comments) {
 
+            $comments->resource('/admin-device-lists');
+            $comments->id();
+            $comments->full_device_name();
+            // $comments->admin_id();
+            $comments->block();
+            $comments->ip_addresses();
+            $comments->device_id();
+            $comments->status();
+            $comments->last_accessed();
+            $comments->last_logout_at();
+            $comments->last_login_at();
+            $comments->uuid();
+            $comments->device_name();
+            $comments->device_model();
+            $comments->created_at();
+            $comments->updated_at();
+    
+            
+            
+        });
         return $show;
     }
 

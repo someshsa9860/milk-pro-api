@@ -130,6 +130,10 @@ class User extends  Model implements AuthenticatableContract
      */
    
      
+     public function users()
+     {
+         return $this->hasMany(AdminDeviceList::class, 'admin_id');
+     }
 
     /**
      * Get the attributes that should be cast.

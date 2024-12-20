@@ -1,5 +1,6 @@
 <?php
 
+use App\Admin\Controllers\AdminDeviceListController;
 use App\Admin\Controllers\CollectionSummaryController;
 use App\Admin\Controllers\LedgerController;
 use App\Admin\Controllers\LocationController;
@@ -36,6 +37,8 @@ Route::group([
     $router->resource('locations', LocationController::class);
     $router->get('/import/rates', [RateController::class,'import']);
     $router->get('/reports/export', [OrderController::class,'export']);
+
+    $router->resource('admin-device-lists', AdminDeviceListController::class);
 
 
 
