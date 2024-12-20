@@ -12,16 +12,25 @@ class UserController extends Controller
 
     function user()
     {
-        return response(User::find(auth()->user()->id));
+
+        $user = User::find(auth()->user()->id);
+        if ($user->status == 1) {
+            return response(['message' => 'Blocked By Admin, please contact to admin.'], 403);
+        }
+
+        return response(
+            $user
+        );
     }
 
-    public function delete($id)  {
-        $user=User::find($id);
-        if(!$user){
-            return response(['message'=>"User does not exists!",401]);
+    public function delete($id)
+    {
+        $user = User::find($id);
+        if (!$user) {
+            return response(['message' => "User does not exists!", 401]);
         }
         $user->delete();
-        return response(['message'=>"User deleted successfully"]);
+        return response(['message' => "User deleted successfully"]);
     }
 
     public function create(Request $request)
@@ -34,7 +43,7 @@ class UserController extends Controller
                 'mobile' => ['required', 'string', 'max:255', 'unique:admin_users'],
             ]);
         }
-        $role=$request->role;
+        $role = $request->role;
 
         $data = [
             'name' => $request->name,
@@ -42,7 +51,7 @@ class UserController extends Controller
             'user_type' => $request->user_type,
             'mobile' => $request->mobile,
             'status' => $request->status,
-            'location_id'=>auth()->user()->location_id
+            'location_id' => auth()->user()->location_id
         ];
         if ($request->has('password')) {
             $data['password'] = Hash::make($request->password);
@@ -90,7 +99,7 @@ class UserController extends Controller
     }
     public function fetch()
     {
-        $users = User::where('location_id',auth()->user()->location_id)->get();
+        $users = User::where('location_id', auth()->user()->location_id)->get();
 
 
         return response($users);

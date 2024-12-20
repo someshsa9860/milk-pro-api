@@ -12,8 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('admin_users', function (Blueprint $table) {
-            $table->boolean("can_edit_order")->default(false);
-            $table->boolean("can_delete_order")->default(false);
+            $table->boolean("can_edit_order")->default(false)->nullable();
+            $table->boolean("can_delete_order")->default(false)->nullable();
+            $table->integer("max_devices")->default(2)->nullable();
         });
     }
 
