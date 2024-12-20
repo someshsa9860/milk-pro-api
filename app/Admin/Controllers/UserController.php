@@ -137,8 +137,10 @@ class UserController extends AdminController
 
         $form->display('created_at', trans('admin.created_at'));
         $form->display('updated_at', trans('admin.updated_at'));
-        $form->switch('status', __('Deleted'))->default(0);
-        $form->switch('can_edit_order_date', __('Allow Edit Order Date'))->default(1);
+        $form->switch('status', __('Block'))->default(0);
+        $form->switch('can_edit_order_date', __('Show Date'))->default(1);
+        $form->switch('can_edit_order', __('Allow Edit Order'))->default(1);
+        $form->switch('can_delete_order', __('Allow Delete Order'))->default(1);
 
         $form->saving(function (Form $form) {
             if ($form->password && $form->model()->password != $form->password) {

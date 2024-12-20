@@ -61,29 +61,31 @@ class RateChart extends Form
     }
     public function check($location_id)
     {
+        // Fetch rates count for the user's location
+        $ratesCount = RateList::where('location_id', $location_id)->count();
+        Log::channel('callvcal')->info('rates: ' . $ratesCount);
+    
+        // Check if no rates exist for the location
+        if ($ratesCount == 0) {
+        Log::channel('callvcal')->info('importing default rats for : ' . $location_id);
+        // Fetch default rates where location_id is "New Rate chart"
+            RateList::where('location_id', 'New Rate chart')
+                ->chunk(100, function ($defaultRates) use ($location_id) {
+                    foreach ($defaultRates as $defaultRate) {
+                        // Replicate the model and set the new location_id
+                        $newRate = $defaultRate->replicate();
+                        $newRate->location_id = $location_id;
+    
+                        // Save the new rate
+                        $newRate->save();
+    
+                        // Log the created rate
+                    }
+                });
 
-        // Fetch rates for the user's location
-        $rates = RateList::where('location_id', $location_id)->count();
-        Log::channel('callvcal')->info('rates: '.$rates);
+                Log::channel('callvcal')->info('imported default rats for : ' . $location_id. ' Is : '.RateList::where('location_id', $location_id)->count());
 
-        return;
-        // Check if the $rates collection is empty
-        if ($rates == 0) {
-            // Fetch default rates where location_id is null
-            $defaultRates = RateList::whereNull('location_id')->get();
-
-            Log::channel('callvcal')->info('defaultRates: '.count($defaultRates));
-
-            // Loop through the default rates and create new rates for the user's location
-            foreach ($defaultRates as $defaultRate) {
-            $res=RateList::create([
-                    'rate' => $defaultRate->rate,
-                    'snf' => $defaultRate->snf,
-                    'fat' => $defaultRate->fat,
-                    'location_id'=>$location_id
-                ]);
-                Log::channel('callvcal')->info('defaultRates:res: '.json_encode($res));
-            }
         }
     }
+    
 }
