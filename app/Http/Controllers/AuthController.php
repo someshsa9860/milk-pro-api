@@ -72,7 +72,7 @@ class AuthController extends Controller
             ], 401);
         }
 
-        if($user->delete==1){
+        if($user->status==1){
             return response([
                 'message' => "You have blocked by admin."
             ], 401);
