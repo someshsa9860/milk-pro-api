@@ -18,6 +18,7 @@ use App\Models\UserData;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\MessageBag;
+use OpenAdmin\Admin\Grid\Filter;
 use OpenAdmin\Admin\Layout\Content;
 use OpenAdmin\Admin\Widgets\Box;
 use OpenAdmin\Admin\Widgets\Table;
@@ -42,20 +43,17 @@ class LedgerController extends AdminController
         $grid->disableCreateButton();
         $grid->fixHeader();
         $grid->expandFilter();
-        $grid->filter(function ($filter) {
-
-            // Remove the default id filter
+        $grid->filter(function (Filter $filter) {
             $filter->disableIdFilter();
-
-            // Add a column filter
-            $filter->equal('customer_id', __('Farmer'))->select(UserData::all()->pluck('last_name', 'user_id'));
-            // $filter->date('order_date_time', __('Order Date'));
             if (isAdmin()) {
                 $filter->equal('location_id', "VSP")->select(Location::all()->pluck('name', 'location_id'));
-            } 
+            }
+             
+            
+          
+            $filter->equal('customer_id', __('Farmer'))->select(UserData::all()->pluck('last_name', 'user_id'));
             $filter->between('order_date_time', 'Collection Date')->date();
 
-            //... additional filter options
         });
         
         return $this->controller->showGrid($grid);

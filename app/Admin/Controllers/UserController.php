@@ -30,8 +30,10 @@ class UserController extends AdminController
         $userModel = config('admin.database.users_model');
 
         $grid = new Grid(new $userModel());
-        $grid->column('status', __('Deleted'))->switch()->sortable();
-        $grid->column('can_edit_order_date', __('Edit Order Date'))->switch()->sortable();
+        $grid->column('status', __('Block'))->switch()->sortable();
+        $grid->column('can_edit_order_date', __('Show Date'))->switch()->sortable();
+        $grid->column('can_edit_order', __('Order Edit Access'))->switch()->sortable();
+        $grid->column('can_delete_order', __('Order Delete Access'))->switch()->sortable();
 
         $grid->model()->where('username', '!=', 'somesh');
 
