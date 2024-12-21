@@ -34,6 +34,7 @@ class UserController extends AdminController
         $grid->column('can_edit_order_date', __('Show Date'))->switch()->sortable();
         $grid->column('can_edit_order', __('Order Edit Access'))->switch()->sortable();
         $grid->column('can_delete_order', __('Order Delete Access'))->switch()->sortable();
+        $grid->column('max_devices', __('Max devices'))->text()->sortable();
 
         $grid->model()->where('username', '!=', 'somesh');
 
@@ -159,6 +160,7 @@ class UserController extends AdminController
         $form->display('created_at', trans('admin.created_at'));
         $form->display('updated_at', trans('admin.updated_at'));
         $form->switch('status', __('Block'))->default(0);
+        $form->number('max_devices', __('Max devices'))->default(2);
         $form->switch('can_edit_order_date', __('Show Date'))->default(1);
         $form->switch('can_edit_order', __('Allow Edit Order'))->default(1);
         $form->switch('can_delete_order', __('Allow Delete Order'))->default(1);
