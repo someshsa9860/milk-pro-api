@@ -85,7 +85,7 @@ class UserController extends AdminController
         $show->field('updated_at', trans('admin.updated_at'));
         $show->users('Devices', function ($comments) {
 
-            $comments->resource('/admin-device-lists');
+            $comments->resource('/admin/admin-device-lists');
             $comments->id();
             $comments->full_device_name();
             // $comments->admin_id();
