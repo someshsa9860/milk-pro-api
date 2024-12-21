@@ -29,7 +29,7 @@ class CreateAdminDeviceListsTable extends Migration
             $table->string('device_name')->nullable();
             $table->string('device_model')->nullable();
             $table->text('session_id')->nullable();
-            $table->foreign('admin_id')->references('id')->on('admin_users')->nullOnDelete();
+            // $table->foreign('admin_id')->references('id')->on('admin_users')->nullOnDelete();
 
             $table->timestamps();
         });
