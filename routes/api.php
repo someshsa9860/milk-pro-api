@@ -31,8 +31,7 @@ Route::post('/auth/login', [AuthController::class, 'login'])->middleware('securi
 
 Route::group(['middleware' => ['security', 'auth:sanctum']], function () {
    
-    Route::post('/postLogout', [AuthController::class, 'postLogout']);
-    Route::get('/auth/status/check', [AuthController::class, 'test']);
+    Route::post('/logout', [AuthController::class, 'logout']);
 
 
     Route::post('users/password/change', [AuthController::class, 'changePassword']);
@@ -42,6 +41,7 @@ Route::group(['middleware' => ['security', 'auth:sanctum']], function () {
  
     Route::get('users/staffs/fetch', [UserController::class, 'fetch']);
     Route::get('user', [UserController::class, 'user']);
+    Route::post('validateUser', [UserController::class, 'validateUser']);
 
     
 

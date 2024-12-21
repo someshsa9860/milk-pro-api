@@ -20,6 +20,7 @@ class CreateAdminDeviceListsTable extends Migration
             $table->boolean('block')->nullable();
             $table->text('ip_addresses')->nullable();
             $table->string('device_id')->nullable();
+            $table->string('device_ad_id')->nullable();
             $table->string('status')->nullable();
             $table->dateTime('last_accessed')->nullable();
             $table->dateTime('last_logout_at')->nullable();

@@ -21,7 +21,7 @@ class AdminDeviceList extends Model
         'last_login_at',
         'uuid',
         'device_name',
-        'device_model',
+        'device_model','device_ad_id'
 
 
     ];

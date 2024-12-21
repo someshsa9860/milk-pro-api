@@ -14,14 +14,8 @@ use PgSql\Lob;
 
 class AuthController extends Controller
 {
-    public function test()
-    {
-        $auth = auth()->user();
-
-        return response([
-            'authenticated' => isset($auth)
-        ]);
-    }
+    
+    
 
 
 
@@ -111,79 +105,24 @@ class AuthController extends Controller
 
         return response($response);
 
-        // $res1=PersonalAccessToken::where('tokenable_id',$user->id)->get();
-
-        // if(count($res1)==0)
-        // {
-        //     // PersonalAccessToken::where('tokenable_id',$user->id)->delete();
-        //     return response([
-        //         'token' => $user->createToken('token')->plainTextToken,
-        //         'user' => $user,
-        //     ]);
-        // }
-        // return response([
-        //     'message' => "Please logout from another device and try again",
-        //     // 'res'=>$res1
-        // ],401);
+       
+        
 
     }
 
     public function logout()
     {
-        if (auth()->user() == null) return response();
-
-        $id = auth()->user()->id;
-
-        $user = User::find($id);
-        $user->status = 0;
-        $user->save();
-
-        // $res1=PersonalAccessToken::where('tokenable_id',$id)->delete();
-        // $res2=PersonalAccessToken::where('tokenable_id',$id)->delete();
-
-
-        return response([
-            // $res1
-            // ,$res2
-        ]);
-    }
-    public function postLogout(Request $request)
-    {
-        if (auth()->user() == null) return response();
-
-        $id = auth()->user()->id;
-
-        $user = User::find($id);
-        $user->status = 0;
-        $user->save();
-
-       
+        
+        
         
 
-        // $res1=PersonalAccessToken::where('tokenable_id',$id)->delete();
-        // $res2=PersonalAccessToken::where('tokenable_id',$id)->delete();
-
-
-        return response([
-            // $res1
-            // ,$res2
-        ]);
+        
+        return response();
     }
-    public function logoutAt($id)
-    {
-
-
-        // $res1=PersonalAccessToken::where('tokenable_id',$id)->delete();
-        $user = User::find($id);
-        $user->status = 0;
-        $user->save();
-
-        return response([
-
-            // ,$res2
-        ]);
-    }
-
+  
+    
+    
+    
 
 
 
