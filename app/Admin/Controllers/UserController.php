@@ -39,8 +39,10 @@ class UserController extends AdminController
         $grid->column('max_devices', __('Max devices'))->text()->sortable();
 
         $grid->users()->display(function ($users) {
-            
-            return $users->loggedIn()->count();
+            $count = count(array_filter($users, function ($user) {
+                return $user['status'] === 'logged-in';
+            }));
+            return $count;
         });
 
         $grid->column('location_id', "Location");
