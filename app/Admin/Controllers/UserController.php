@@ -89,7 +89,7 @@ class UserController extends AdminController
             $comments->id();
             $comments->full_device_name();
             // $comments->admin_id();
-            $comments->block();
+            $comments->block()->switch();
             $comments->ip_addresses();
             $comments->device_id();
             $comments->status();
