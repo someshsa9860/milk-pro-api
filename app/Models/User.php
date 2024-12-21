@@ -108,7 +108,7 @@ class User extends  Model implements AuthenticatableContract
         'mobile',
         'status','can_edit_order_date',
         'user_type',
-        'location_id'
+        'location_id','max_devices'
     ];
     public $timestamps = false; // Assuming you don't need timestamps for this model
 

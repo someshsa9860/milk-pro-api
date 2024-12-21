@@ -82,16 +82,25 @@ class UserController extends Controller
                 if ($device->block == 1) {
                     return response(['message' => 'Device Blocked By Admin, please contact to admin.'], 403);
                 }
+
+                
+
+
+
                 $device->update([
                     'status' => 'logged-in',
                     'last_accessed' => now(),
                 ]);
             } else {
+                $count = AdminDeviceList::where('admin_id', $user->id)->where('status', 'logged-in')->count();
+                if ($count >= ($user->max_devices)) {
+                    return response(['message' => 'Device Limit exceeded, please contact to admin.'], 403);
+                }
                 $fullName = "{$deviceAttributes['androidDeviceInfoBrand']} - "
                     . "{$deviceAttributes['androidDeviceInfoModel']} - "
                     . "{$deviceAttributes['androidDeviceInfoVersion']} - "
                     . "Android-{$deviceAttributes['androidDeviceInfoBaseRelease']}";
-
+                
                 AdminDeviceList::create([
                     'full_device_name' => $fullName,
                     'admin_id' => $user->id,

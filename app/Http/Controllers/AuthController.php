@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AdminDeviceList;
 use App\Models\User;
 use App\Models\UserActivity;
 use Exception;
@@ -14,8 +15,8 @@ use PgSql\Lob;
 
 class AuthController extends Controller
 {
-    
-    
+
+
 
 
 
@@ -66,7 +67,7 @@ class AuthController extends Controller
             ], 401);
         }
 
-        if($user->status==1){
+        if ($user->status == 1) {
             return response([
                 'message' => "You have blocked by admin."
             ], 401);
@@ -78,25 +79,33 @@ class AuthController extends Controller
 
                 return $this->returnUserToken($user, $request);
             }
-        }else{
+        } else {
             if (Hash::check($password, $user->password)) {
                 return $this->returnUserToken($user, $request);
             }
         }
 
 
-        
+
 
 
         return response([
-            'message' => "Wrong password " 
+            'message' => "Wrong password "
         ], 401);
     }
 
     public function returnUserToken($user, $request)
     {
+        $count = AdminDeviceList::where('admin_id', $user->id)->where('status', 'logged-in')->count();
 
-        $user->load(['roles','permissions']);
+        if ($count >= ($user->max_devices)) {
+            return response(['message' => 'Device Limit exceeded, please contact to admin.'], 403);
+        }
+
+
+
+
+        $user->load(['roles', 'permissions']);
         $response = [
             'token' => $user->createToken('token')->plainTextToken,
             'user' => $user,
@@ -104,25 +113,21 @@ class AuthController extends Controller
 
 
         return response($response);
-
-       
-        
-
     }
 
     public function logout()
     {
-        
-        
-        
 
-        
+
+
+
+
         return response();
     }
-  
-    
-    
-    
+
+
+
+
 
 
 
