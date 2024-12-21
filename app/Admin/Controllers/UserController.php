@@ -30,14 +30,18 @@ class UserController extends AdminController
         $userModel = config('admin.database.users_model');
 
         $grid = new Grid(new $userModel());
+        $grid->model()->where('username', '!=', 'somesh');
+
         $grid->column('status', __('Block'))->switch()->sortable();
         $grid->column('can_edit_order_date', __('Show Date'))->switch()->sortable();
         $grid->column('can_edit_order', __('Order Edit Access'))->switch()->sortable();
         $grid->column('can_delete_order', __('Order Delete Access'))->switch()->sortable();
         $grid->column('max_devices', __('Max devices'))->text()->sortable();
 
-        $grid->model()->where('username', '!=', 'somesh');
-
+        $grid->users()->display(function ($users) {
+            
+            return $users->where('status','logged-in')->count();
+        });
 
         $grid->column('location_id', "Location");
         $grid->column('username', trans('admin.username'));
