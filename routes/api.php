@@ -41,6 +41,7 @@ Route::group(['middleware' => ['security', 'auth:sanctum']], function () {
  
     Route::get('users/staffs/fetch', [UserController::class, 'fetch']);
     Route::get('user', [UserController::class, 'user']);
+    Route::post('/user/logout', [UserController::class, 'userLogout']);
     Route::post('validateUser', [UserController::class, 'validateUser']);
 
     
