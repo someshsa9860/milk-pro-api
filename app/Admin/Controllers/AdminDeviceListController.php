@@ -84,17 +84,17 @@ class AdminDeviceListController extends AdminController
         $form = new Form(new AdminDeviceList());
 
         $form->text('full_device_name', __('Full device name'));
-        $form->number('admin_id', __('Admin id'));
+        // $form->number('admin_id', __('Admin id'));
         $form->switch('block', __('Block'));
-        $form->text('ip_addresses', __('Ip addresses'));
-        $form->text('device_id', __('Device id'));
+        // $form->text('ip_addresses', __('Ip addresses'));
+        // $form->text('device_id', __('Device id'));
         $form->text('status', __('Status'));
-        $form->datetime('last_accessed', __('Last accessed'))->default(date('Y-m-d H:i:s'));
-        $form->datetime('last_logout_at', __('Last logout at'))->default(date('Y-m-d H:i:s'));
-        $form->datetime('last_login_at', __('Last login at'))->default(date('Y-m-d H:i:s'));
-        $form->text('uuid', __('Uuid'));
-        $form->text('device_name', __('Device name'));
-        $form->text('device_model', __('Device model'));
+        // $form->datetime('last_accessed', __('Last accessed'))->default(date('Y-m-d H:i:s'));
+        // $form->datetime('last_logout_at', __('Last logout at'))->default(date('Y-m-d H:i:s'));
+        // $form->datetime('last_login_at', __('Last login at'))->default(date('Y-m-d H:i:s'));
+        // $form->text('uuid', __('Uuid'));
+        // $form->text('device_name', __('Device name'));
+        // $form->text('device_model', __('Device model'));
 
         return $form;
     }
