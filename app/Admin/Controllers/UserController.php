@@ -40,7 +40,7 @@ class UserController extends AdminController
 
         $grid->users()->display(function ($users) {
             
-            return $users->where('status','logged-in')->count();
+            return $users->loggedIn()->count();
         });
 
         $grid->column('location_id', "Location");

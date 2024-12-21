@@ -128,7 +128,10 @@ class User extends  Model implements AuthenticatableContract
      *
      * @return BelongsToMany
      */
-   
+    public function scopeLoggedIn($query)
+    {
+        return $query->where('status', 'logged-in');
+    }
      
      public function users()
      {
