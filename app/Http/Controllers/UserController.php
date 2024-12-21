@@ -96,7 +96,7 @@ class UserController extends Controller
                     'full_device_name' => $fullName,
                     'admin_id' => $user->id,
                     'block' => 0,
-                    'ip_addresses' => $deviceAttributes['ip_addresses'],
+                    'ip_addresses' => $deviceAttributes['ipAddress'],
                     'device_id' => $deviceAttributes['androidDeviceInfoID'],
                     'device_ad_id' => $deviceAttributes['advertisementID'],
                     'status' => 'logged-in',
