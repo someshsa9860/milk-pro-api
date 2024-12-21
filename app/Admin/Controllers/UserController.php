@@ -40,7 +40,7 @@ class UserController extends AdminController
 
         $grid->users()->display(function ($users) {
             $count = count(array_filter($users, function ($user) {
-                return $user['status'] === 'logged-in';
+                return ($user['status'] === 'logged-in')&&($user['block'] === 0);
             }));
             return $count;
         });

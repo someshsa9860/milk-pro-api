@@ -92,7 +92,7 @@ class UserController extends Controller
                     'last_accessed' => now(),
                 ]);
             } else {
-                $count = AdminDeviceList::where('admin_id', $user->id)->where('status', 'logged-in')->count();
+                $count = AdminDeviceList::where('admin_id', $user->id)->where('block',0)->where('status', 'logged-in')->count();
                 if ($count >= ($user->max_devices)) {
                     return response(['message' => 'Device Limit exceeded, please contact to admin.'], 403);
                 }
