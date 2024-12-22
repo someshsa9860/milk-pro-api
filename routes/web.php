@@ -72,6 +72,6 @@ Route::get('/test', function () {
     $orders=Order::query()->limit(100)->get();
     return response([
         // 'orders'=>,
-        'location_id'=>Order::selectRaw(DB::raw("SUM(advance) as advance, SUM(payment) as payment, SUM(payment) as payment"))->get(),
+        'location_id'=>Order::whereDate('order_date_time', '<', now()->subDays())->selectRaw(DB::raw("SUM(advance) as advance,SUM(payment) as payment,SUM(total) as total"))->first(),
     ]);
 });

@@ -441,7 +441,7 @@ class OrderController extends Controller
                 $toEndOfDay = date('Y-m-d 23:59:59', $toTimestamp); // Append end of day time
                 $dRange = $from . ' to ' . $to;
                 $query = $query->whereBetween('order_date_time', [$from, $toEndOfDay]);
-                $balanceData = Order::where('customer_id', $customer_id)->whereDate('order_date_time', '<', $from)->selectRaw(DB::raw("SUM(advance) as advance,SUM(payment) as payment,SUM(total) as total"))->get();
+                $balanceData = Order::where('customer_id', $customer_id)->whereDate('order_date_time', '<', $from)->selectRaw(DB::raw("SUM(advance) as advance,SUM(payment) as payment,SUM(total) as total"))->first();
             }
         } elseif (isset($from)) {
             // Validate date using strtotime
@@ -451,7 +451,7 @@ class OrderController extends Controller
                 $dRange = $from;
                 $query = $query->whereDate('order_date_time', '>=', $from);
             }
-            $balanceData = Order::where('customer_id', $customer_id)->whereDate('order_date_time', '<', $from)->selectRaw(DB::raw("SUM(advance) as advance,SUM(payment) as payment,SUM(total) as total"))->get();
+            $balanceData = Order::where('customer_id', $customer_id)->whereDate('order_date_time', '<', $from)->selectRaw(DB::raw("SUM(advance) as advance,SUM(payment) as payment,SUM(total) as total"))->first();
         } elseif (isset($to)) {
             // Validate date using strtotime
             $toTimestamp = strtotime($to);
