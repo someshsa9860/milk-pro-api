@@ -47,10 +47,10 @@ class RetailerController extends AdminController
         if (!isAdmin()) {
             $grid->model()->where('location_id', Admin::user()->location_id);
         } else {
-            $grid->column('location_id', "Location");
+            $grid->column('location_id', "Location")->sortable();
         }
         $grid->column('status', __('Deleted'))->switch()->sortable();
-        $grid->column('location_id', "Location");
+        $grid->column('location_id', "Location")->sortable();
         $grid->column('id', __('Id'))->sortable();
         $grid->column('last_name', __('Name'))->sortable();
         $grid->column('contact', __('contact'))->sortable();

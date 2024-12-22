@@ -75,8 +75,10 @@ class DownloadReport extends Form
 
         $this->date('from', 'From Date');
         $this->date('to', 'To Date');
-        $this->select('customer_id', 'Farmer')->options(UserData::pluck('last_name', 'user_id'));
-        $this->select('location_id', 'VSP')->options(Location::pluck('location_id', 'location_id'));
+        $this->select('location_id', 'VSP')->options(Location::pluck('location_id', 'location_id'))->load('customer_id', '/admin/api/customers');;
+        // $this->select('customer_id', 'Farmer')->options(UserData::pluck('last_name', 'user_id'));
+        $this->select('customer_id', 'Farmer');
+
         // $this->select('type','Report Type')->options([
         //     'ledger'=>'ledger',
         //     'collection'=>'collection',

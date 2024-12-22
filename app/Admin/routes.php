@@ -9,6 +9,7 @@ use App\Admin\Controllers\OrderItemController;
 use App\Admin\Controllers\RateController;
 use App\Admin\Controllers\RetailerController;
 use App\Admin\Controllers\UserController;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\OrderController as ControllersOrderController;
 use Illuminate\Routing\Router;
 
@@ -37,6 +38,7 @@ Route::group([
     $router->resource('locations', LocationController::class);
     $router->get('/import/rates', [RateController::class,'import']);
     $router->get('/reports/export', [OrderController::class,'export']);
+    $router->post('/api/customers', [HomeController::class,'customers']);
 
     $router->resource('admin-device-lists', AdminDeviceListController::class);
 
