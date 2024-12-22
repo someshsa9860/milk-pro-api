@@ -43,7 +43,7 @@ class UserController extends AdminController
                 return ($user['status'] === 'logged-in')&&($user['block'] === 0);
             }));
             return $count;
-        });
+        })->sortable();
 
         $grid->column('location_id', "Location");
         $grid->column('username', trans('admin.username'));

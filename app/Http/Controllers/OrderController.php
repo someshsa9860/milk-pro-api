@@ -167,34 +167,31 @@ class OrderController extends Controller
             // Validate dates using strtotime
             $fromTimestamp = strtotime($from);
             $toTimestamp = strtotime($to);
-        
+
             if ($fromTimestamp !== false && $toTimestamp !== false) {
                 $toEndOfDay = date('Y-m-d 23:59:59', $toTimestamp); // Append end of day time
                 $dRange = $from . ' to ' . $to;
                 $query = $query->whereBetween('order_date_time', [$from, $toEndOfDay]);
-            } 
-            
+            }
         } elseif (isset($from)) {
             // Validate date using strtotime
             $fromTimestamp = strtotime($from);
-        
+
             if ($fromTimestamp !== false) {
                 $dRange = $from;
                 $query = $query->whereDate('order_date_time', '>=', $from);
-            } 
-            
+            }
         } elseif (isset($to)) {
             // Validate date using strtotime
             $toTimestamp = strtotime($to);
-        
+
             if ($toTimestamp !== false) {
                 $toEndOfDay = date('Y-m-d 23:59:59', $toTimestamp); // Append end of day time
                 $dRange = $to;
                 $query = $query->where('order_date_time', '<=', $toEndOfDay);
-            } 
-            
+            }
         }
-        
+
 
 
         $orders = $query->get();
@@ -212,56 +209,60 @@ class OrderController extends Controller
 
 
         // If customer_id is null, group by customer_id and calculate sums
-        if (is_null($customer_id)) {
+
+        if (isset($location_id)) {
             $orders = $orders->groupBy('customer_id');
-
-            foreach ($orders as $customer_id => $group) {
-                $total_litres = $group->sum(fn ($order) => $order->cow_litres + $order->buffalo_litres + $order->mixed_litres);
-                $total_amount = $group->sum(fn ($order) => $order->cow_amt + $order->buffalo_amt + $order->mixed_amt);
-                $total_advance = $group->sum('advance');
-                $total_payment = $group->sum('payment');
-
-                $totalAmount += $total_amount;
-                $totalLitres += $total_litres;
-                $totalAdvance += $total_advance;
-                $totalPayment += $total_payment;
-                $avg_fat = round($group->avg(fn ($order) => $order->cow_fat + $order->buffalo_fat + $order->mixed_fat), 2);
-                $avg_snf = round($group->avg(fn ($order) => $order->cow_snf + $order->buffalo_snf + $order->mixed_snf), 2);
-                $avgFat += $avg_fat;
-                $avgSNF += $avg_snf;
-                $closing_balance = $total_amount - $total_payment - $total_advance;
+        } else {
+            $orders = $orders->groupBy('location_id');
+        }
 
 
+        foreach ($orders as  $group) {
+            $total_litres = $group->sum(fn ($order) => $order->cow_litres + $order->buffalo_litres + $order->mixed_litres);
+            $total_amount = $group->sum(fn ($order) => $order->cow_amt + $order->buffalo_amt + $order->mixed_amt);
+            $total_advance = $group->sum('advance');
+            $total_payment = $group->sum('payment');
 
-                $ordersArrayData[] = [
-                    'VSP' => $group->first()->location_id ?? 'N/A',
-                    'Member' => $group->first()->customer->last_name ?? 'N/A',
-                    'Date' => $dRange,
-                    'Shift' => 'Morning & Evening',
-                    'Type' => 'Cow & Buffalo',
-                    'Qty(ltr)' => $total_litres,
-                    'Avg Fat' => $avg_fat,
-                    'Avg SNF' => $avg_snf,
-
-                    'Rate' => round($total_amount / max(1, $total_litres), 2), // Average rate per litre
-                    'Amount' => $total_amount,
-
-                    'Advance' => $total_advance,
-                    'Payment' => $total_payment,
-
-                    'closing_balance' => $closing_balance,
-
-
-                    'balance' => $total_amount - $total_payment,
-
-                    'T_Amount' => $total_amount,
+            $totalAmount += $total_amount;
+            $totalLitres += $total_litres;
+            $totalAdvance += $total_advance;
+            $totalPayment += $total_payment;
+            $avg_fat = round($group->avg(fn ($order) => $order->cow_fat + $order->buffalo_fat + $order->mixed_fat), 2);
+            $avg_snf = round($group->avg(fn ($order) => $order->cow_snf + $order->buffalo_snf + $order->mixed_snf), 2);
+            $avgFat += $avg_fat;
+            $avgSNF += $avg_snf;
+            $closing_balance = $total_amount - $total_payment - $total_advance;
 
 
 
+            $ordersArrayData[] = [
+                'VSP' => $group->first()->location_id ?? 'N/A',
+                'Member' => $group->first()->customer->last_name ?? 'N/A',
+                'Date' => $dRange,
+                'Shift' => 'Morning & Evening',
+                'Type' => 'Cow & Buffalo',
+                'Qty(ltr)' => $total_litres,
+                'Avg Fat' => $avg_fat,
+                'Avg SNF' => $avg_snf,
 
-                    'Remark' => '', // Placeholder for remarks
-                ];
-            }
+                'Rate' => round($total_amount / max(1, $total_litres), 2), // Average rate per litre
+                'Amount' => $total_amount,
+
+                'Advance' => $total_advance,
+                'Payment' => $total_payment,
+
+                'closing_balance' => $closing_balance,
+
+
+                'balance' => $total_amount - $total_payment,
+
+                'T_Amount' => $total_amount,
+
+
+
+
+                'Remark' => '', // Placeholder for remarks
+            ];
         }
 
         // Define headers
@@ -320,8 +321,8 @@ class OrderController extends Controller
             $row++;
         }
 
-        $count=count($orderData);
-        $count=max(1,$count);
+        $count = count($orderData);
+        $count = max(1, $count);
 
         $sheet->setCellValue('E' . $row, 'Total');
         $sheet->mergeCells('A' . $row . ':E' . $row); // Merge for better display
@@ -361,36 +362,33 @@ class OrderController extends Controller
             // Validate dates using strtotime
             $fromTimestamp = strtotime($from);
             $toTimestamp = strtotime($to);
-        
+
             if ($fromTimestamp !== false && $toTimestamp !== false) {
                 $toEndOfDay = date('Y-m-d 23:59:59', $toTimestamp); // Append end of day time
                 $dRange = $from . ' to ' . $to;
                 $query = $query->whereBetween('order_date_time', [$from, $toEndOfDay]);
             }
-            
         } elseif (isset($from)) {
             // Validate date using strtotime
             $fromTimestamp = strtotime($from);
-        
+
             if ($fromTimestamp !== false) {
                 $dRange = $from;
                 $query = $query->whereDate('order_date_time', '>=', $from);
-            } 
-            
+            }
         } elseif (isset($to)) {
             // Validate date using strtotime
             $toTimestamp = strtotime($to);
-        
+
             if ($toTimestamp !== false) {
                 $toEndOfDay = date('Y-m-d 23:59:59', $toTimestamp); // Append end of day time
                 $dRange = $to;
                 $query = $query->where('order_date_time', '<=', $toEndOfDay);
             }
-            
         }
-        
 
-        $orders = $query->orderBy('order_date_time','ASC')->get();
+
+        $orders = $query->orderBy('order_date_time', 'ASC')->get();
         // Log::channel('callvcal')->info('export:'.json_encode($orders));
 
         // Define headers
@@ -540,7 +538,7 @@ class OrderController extends Controller
             $row++;
         }
 
-        $count=max(1,$count);
+        $count = max(1, $count);
         // Add summation rows
         $sheet->setCellValue('A' . $row, 'Totals');
         $sheet->mergeCells('A' . $row . ':E' . $row); // Merge for better display
