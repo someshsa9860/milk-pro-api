@@ -470,11 +470,7 @@ class OrderController extends Controller
         // Log::channel('callvcal')->info('export:'.json_encode($orders));
 
         // Define headers
-        $headers = [
-            'VSP', 'Member', 'Date', 'Shift', 'Type', 'Litres', 'Fat', 'CLR', 'SNF', 'Rate', 'Amount',  'Remark', 'Advance', 'Payment', 'Balance'
-        ];
-
-
+       
         ///formula: balance= total-payment-advance
 
         // Initialize total counters
@@ -494,6 +490,9 @@ class OrderController extends Controller
         }
         // Prepare data rows
         $orderData = [];
+        $headers = [
+            'VSP', 'Member', 'Date', 'Shift', 'Type', 'Litres', 'Fat', 'CLR', 'SNF', 'Rate', 'Amount',  'Remark', 'Advance', 'Payment', 'Balance'
+        ];
         $orderData[] = [
             'START',
             '-',
@@ -501,6 +500,7 @@ class OrderController extends Controller
             '-',
             '-',
 
+            '0',
             '0',
             '0',
             '0',
