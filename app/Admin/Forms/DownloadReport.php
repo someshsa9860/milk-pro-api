@@ -33,12 +33,19 @@ class DownloadReport extends Form
      */
     public function handle(Request $request)
     {
+        // Generate the file path
         $filePath = (new ControllersOrderController())->exportLedger($request->from, $request->to, $request->customer_id, $request->location_id);
-
-        $fileName = ($filePath);
+    
+        // Ensure the file path is URL-compatible
+        $fileName = str_replace(public_path(), '', $filePath);
         $downloadUrl = url($fileName);
-
-        // Return HTML with a JavaScript redirect and back navigation
+    
+        // Log for debugging
+        Log::info("Generated File Path: $filePath");
+        Log::info("Relative File Name: $fileName");
+        Log::info("Download URL: $downloadUrl");
+    
+        // Return HTML with JavaScript redirection
         return response()->make(
             "<html>
                 <head>
@@ -58,6 +65,7 @@ class DownloadReport extends Form
             </html>"
         );
     }
+    
 
 
 
