@@ -332,16 +332,35 @@ class OrderController extends Controller
         $sheet->setCellValue('K' . $row, $totalAmount); // Total Amount
         $sheet->setCellValue('M' . $row, $totalAdvance); // Total Advance
         $sheet->setCellValue('O' . $row, $totalPayment); // Total Payment
-        // Save the Excel file
+        // // Save the Excel file
+        // $fileName = 'reports/ledger_report_' . now()->format('Y_m_d_H_i_s') . '.xlsx';
+
+        // $writer = new Xlsx($spreadsheet);
+        // $filePath = public_path($fileName);
+        // if (!file_exists(public_path('reports'))) {
+        //     mkdir(public_path('reports'));
+        // }
+        // $writer->save($filePath);
+
+        // return $fileName;
         $fileName = 'reports/ledger_report_' . now()->format('Y_m_d_H_i_s') . '.xlsx';
-
-        $writer = new Xlsx($spreadsheet);
+        $directoryPath = public_path('reports');
         $filePath = public_path($fileName);
-        if (!file_exists(public_path('reports'))) {
-            mkdir(public_path('reports'));
-        }
-        $writer->save($filePath);
 
+        // Ensure the directory exists
+        if (!is_dir($directoryPath)) {
+            mkdir($directoryPath, 0755, true); // Recursive directory creation
+        }
+
+        try {
+            $writer = new Xlsx($spreadsheet);
+            $writer->save($filePath);
+        } catch (\Exception $e) {
+            Log::error('Error saving Excel file: ' . $e->getMessage());
+            throw $e; // Optional: rethrow for debugging
+        }
+
+        // Return the relative path for the file
         return $fileName;
     }
 
@@ -550,16 +569,35 @@ class OrderController extends Controller
         $sheet->setCellValue('G' . $row, round(($avgFat) / ($count), 2)); // Total Amount
         $sheet->setCellValue('I' . $row, round($avgSNF / $count, 2)); // Total Amount
         // Save the Excel file
+        // $fileName = 'reports/ledger_report_' . now()->format('Y_m_d_H_i_s') . '.xlsx';
+
+
+        // $writer = new Xlsx($spreadsheet);
+        // $filePath = public_path($fileName);
+        // if (!file_exists(public_path('reports'))) {
+        //     mkdir(public_path('reports'));
+        // }
+        // $writer->save($filePath);
+
+        // return $fileName;
         $fileName = 'reports/ledger_report_' . now()->format('Y_m_d_H_i_s') . '.xlsx';
-
-
-        $writer = new Xlsx($spreadsheet);
+        $directoryPath = public_path('reports');
         $filePath = public_path($fileName);
-        if (!file_exists(public_path('reports'))) {
-            mkdir(public_path('reports'));
-        }
-        $writer->save($filePath);
 
+        // Ensure the directory exists
+        if (!is_dir($directoryPath)) {
+            mkdir($directoryPath, 0755, true); // Recursive directory creation
+        }
+
+        try {
+            $writer = new Xlsx($spreadsheet);
+            $writer->save($filePath);
+        } catch (\Exception $e) {
+            Log::error('Error saving Excel file: ' . $e->getMessage());
+            throw $e; // Optional: rethrow for debugging
+        }
+
+        // Return the relative path for the file
         return $fileName;
     }
 
