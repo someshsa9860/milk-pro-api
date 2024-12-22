@@ -243,7 +243,7 @@ class OrderController extends Controller
             $closing_balance = $total_amount - $total_payment - $total_advance;
 
             // $vsp = $group->first()->location_id;
-            $vsp =Location::where('location_id',$group->first()->location_id)->first()?? $group->first()->location_id?? $group->first()->user->name ?? '-';
+            $vsp =Location::where('location_id',$group->first()->location_id)->first()->location_name?? $group->first()->location_id?? $group->first()->user->name ?? '-';
             $member = 'all';
             if (isset($location_id)) {
                 $member = $group->first()->customer->last_name ?? $member;
