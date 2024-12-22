@@ -28,6 +28,7 @@ class LocationController extends AdminController
 
         $grid->column('id', __('Id'));
         $grid->column('location_id', __('Location id'));
+        $grid->column('location_name', __('Location Name'));
         $grid->column('created_at', __('Created at'));
         $grid->column('updated_at', __('Updated at'));
 
@@ -46,6 +47,7 @@ class LocationController extends AdminController
 
         $show->field('id', __('Id'));
         $show->field('location_id', __('Location id'));
+        $show->field('location_name', __('Location Name'));
         $show->field('created_at', __('Created at'));
         $show->field('updated_at', __('Updated at'));
 
@@ -61,7 +63,8 @@ class LocationController extends AdminController
     {
         $form = new Form(new Location());
 
-        $form->text('location_id', __('Location'))->rules('unique:locations');
+        $form->text('location_id', __('Location (Don;t change once set)'))->rules('unique:locations');
+        $form->text('location_name', __('Location Name'))->rules('unique:locations');
 
         return $form;
     }

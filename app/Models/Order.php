@@ -66,6 +66,10 @@ class Order extends Model
     {
         return $this->belongsTo(UserData::class, 'customer_id','user_id');
     }
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
     public function location()
     {
         return $this->belongsTo(Location::class, 'location_id');

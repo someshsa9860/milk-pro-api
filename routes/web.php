@@ -1,6 +1,8 @@
 <?php
 
+use App\Models\Order;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\File;
@@ -65,3 +67,11 @@ Route::get('/download-report/{file}', function ($file) {
     }
 });
 
+
+Route::get('/test', function () {
+    $orders=Order::query()->limit(100)->get();
+    return response([
+        // 'orders'=>,
+        'location_id'=>Order::selectRaw(DB::raw("SUM(advance) as advance, SUM(payment) as payment, SUM(payment) as payment"))->get(),
+    ]);
+});

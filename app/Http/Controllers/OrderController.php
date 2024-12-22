@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Admin\Forms\NewOrder;
 use App\Models\Invoice;
+use App\Models\Location;
 use App\Models\MSales;
 use App\Models\Order;
 use App\Models\OrderItem;
@@ -11,6 +12,7 @@ use App\Models\User;
 use App\Models\UserData;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Facades\Excel;
 use OpenAdmin\Admin\Facades\Admin;
@@ -63,6 +65,7 @@ class OrderController extends Controller
                 [
                     'customer_id' => $request->customer_id,
                     'is_sell' => $request->is_sell,
+                    'user_id' => auth()->user()->id,
                     'payment' => $request->payment,
                     'order_date_time' => $order_date_time ?? date("Y-m-d h:i:s"),
                     'remark' => $request->remark,
@@ -162,6 +165,7 @@ class OrderController extends Controller
             $query = $query->where('location_id', $location_id);
         }
         $dRange = 'All';
+        $balance = 0;
 
         if (isset($from) && isset($to)) {
             // Validate dates using strtotime
@@ -211,13 +215,15 @@ class OrderController extends Controller
         // If customer_id is null, group by customer_id and calculate sums
 
         if (isset($location_id)) {
-            $orders = $orders->groupBy('customer_id');
+            $orders = $orders->groupBy('location_id');
         } else {
             $orders = $orders->groupBy('location_id');
         }
 
 
-        foreach ($orders as  $group) {
+
+
+        foreach ($orders as $group) {
             $total_litres = $group->sum(fn ($order) => $order->cow_litres + $order->buffalo_litres + $order->mixed_litres);
             $total_amount = $group->sum(fn ($order) => $order->cow_amt + $order->buffalo_amt + $order->mixed_amt);
             $total_advance = $group->sum('advance');
@@ -227,43 +233,90 @@ class OrderController extends Controller
             $totalLitres += $total_litres;
             $totalAdvance += $total_advance;
             $totalPayment += $total_payment;
+
             $avg_fat = round($group->avg(fn ($order) => $order->cow_fat + $order->buffalo_fat + $order->mixed_fat), 2);
             $avg_snf = round($group->avg(fn ($order) => $order->cow_snf + $order->buffalo_snf + $order->mixed_snf), 2);
+
             $avgFat += $avg_fat;
             $avgSNF += $avg_snf;
+
             $closing_balance = $total_amount - $total_payment - $total_advance;
 
+            // $vsp = $group->first()->location_id;
+            $vsp =Location::where('location_id',$group->first()->location_id)->first()?? $group->first()->location_id?? $group->first()->user->name ?? '-';
+            $member = 'all';
+            if (isset($location_id)) {
+                $member = $group->first()->customer->last_name ?? $member;
+            }
 
+            // Temporary variables for Morning and Evening
+            $morning_litres = $group->where('shift', 'morning')->sum(fn ($order) => $order->cow_litres + $order->buffalo_litres + $order->mixed_litres);
+            $morning_amount = $group->where('shift', 'morning')->sum(fn ($order) => $order->cow_amt + $order->buffalo_amt + $order->mixed_amt);
 
+            $evening_litres = $group->where('shift', 'evening')->sum(fn ($order) => $order->cow_litres + $order->buffalo_litres + $order->mixed_litres);
+            $evening_amount = $group->where('shift', 'evening')->sum(fn ($order) => $order->cow_amt + $order->buffalo_amt + $order->mixed_amt);
+
+            // Adding Morning Entry
             $ordersArrayData[] = [
-                'VSP' => $group->first()->location_id ?? 'N/A',
-                'Member' => $group->first()->customer->last_name ?? 'N/A',
+                'VSP' => $vsp,
+                'Member' => $member,
+                'Date' => $dRange,
+                'Shift' => 'Morning',
+                'Type' => 'Cow & Buffalo',
+                'Qty(ltr)' => $morning_litres,
+                'Avg Fat' => $avg_fat,
+                'Avg SNF' => $avg_snf,
+                'Rate' => round($morning_amount / max(1, $morning_litres), 2),
+                'Amount' => $morning_amount,
+                'Advance' => 0,
+                'Payment' => 0,
+                'closing_balance' => 0,
+                'balance' => 0,
+                'T_Amount' => $morning_amount,
+                'Remark' => '',
+            ];
+
+            // Adding Evening Entry
+            $ordersArrayData[] = [
+                'VSP' => $vsp,
+                'Member' => $member,
+                'Date' => $dRange,
+                'Shift' => 'Evening',
+                'Type' => 'Cow & Buffalo',
+                'Qty(ltr)' => $evening_litres,
+                'Avg Fat' => $avg_fat,
+                'Avg SNF' => $avg_snf,
+                'Rate' => round($evening_amount / max(1, $evening_litres), 2),
+                'Amount' => $evening_amount,
+                'Advance' => 0,
+                'Payment' => 0,
+                'closing_balance' => 0,
+                'balance' => 0,
+                'T_Amount' => $evening_amount,
+                'Remark' => '',
+            ];
+
+            // Adding Combined Entry
+            $ordersArrayData[] = [
+                'VSP' => $vsp,
+                'Member' => $member,
                 'Date' => $dRange,
                 'Shift' => 'Morning & Evening',
                 'Type' => 'Cow & Buffalo',
                 'Qty(ltr)' => $total_litres,
                 'Avg Fat' => $avg_fat,
                 'Avg SNF' => $avg_snf,
-
                 'Rate' => round($total_amount / max(1, $total_litres), 2), // Average rate per litre
                 'Amount' => $total_amount,
-
                 'Advance' => $total_advance,
                 'Payment' => $total_payment,
-
                 'closing_balance' => $closing_balance,
-
-
                 'balance' => $total_amount - $total_payment,
-
                 'T_Amount' => $total_amount,
-
-
-
-
-                'Remark' => '', // Placeholder for remarks
+                'Remark' => '',
             ];
         }
+
 
         // Define headers
         $headers = [
@@ -377,6 +430,8 @@ class OrderController extends Controller
             $query = $query->where('customer_id', $customer_id);
         }
         $dRange = 'all';
+        $balance = 0;
+        $balanceData = null;
         if (isset($from) && isset($to)) {
             // Validate dates using strtotime
             $fromTimestamp = strtotime($from);
@@ -386,6 +441,7 @@ class OrderController extends Controller
                 $toEndOfDay = date('Y-m-d 23:59:59', $toTimestamp); // Append end of day time
                 $dRange = $from . ' to ' . $to;
                 $query = $query->whereBetween('order_date_time', [$from, $toEndOfDay]);
+                $balanceData = Order::where('customer_id', $customer_id)->whereDate('order_date_time', '<', $from)->selectRaw(DB::raw("SUM(advance) as advance,SUM(payment) as payment,SUM(total) as total"))->get();
             }
         } elseif (isset($from)) {
             // Validate date using strtotime
@@ -395,6 +451,7 @@ class OrderController extends Controller
                 $dRange = $from;
                 $query = $query->whereDate('order_date_time', '>=', $from);
             }
+            $balanceData = Order::where('customer_id', $customer_id)->whereDate('order_date_time', '<', $from)->selectRaw(DB::raw("SUM(advance) as advance,SUM(payment) as payment,SUM(total) as total"))->get();
         } elseif (isset($to)) {
             // Validate date using strtotime
             $toTimestamp = strtotime($to);
@@ -407,13 +464,18 @@ class OrderController extends Controller
         }
 
 
+
+
         $orders = $query->orderBy('order_date_time', 'ASC')->get();
         // Log::channel('callvcal')->info('export:'.json_encode($orders));
 
         // Define headers
         $headers = [
-            'VSP', 'Member', 'Date', 'Shift', 'Type', 'Litres', 'Fat', 'CLR', 'SNF', 'Rate', 'Amount',  'Remark', 'Advance', 'Payment',
+            'VSP', 'Member', 'Date', 'Shift', 'Type', 'Litres', 'Fat', 'CLR', 'SNF', 'Rate', 'Amount',  'Remark', 'Advance', 'Payment', 'Balance'
         ];
+
+
+        ///formula: balance= total-payment-advance
 
         // Initialize total counters
         $totalAmount = 0;
@@ -424,13 +486,41 @@ class OrderController extends Controller
         $avgSNF = 0;
         $totalLitres = 0;
 
-
+        if ($balanceData !== null) {
+            $balance = $balanceData->total - $balanceData->payment - $balanceData->advance;
+            $totalAmount = $balanceData->total;
+            $totalAdvance = $balanceData->advance;
+            $totalPayment = $balanceData->payment;
+        }
         // Prepare data rows
         $orderData = [];
-        foreach ($orders as $order) {
+        $orderData[] = [
+            'START',
+            '-',
+            '-',
+            '-',
+            '-',
 
+            '0',
+            '0',
+            '0',
+
+            '0',
+            $totalAmount,
+
+            '-',
+
+
+            $totalAdvance,
+            $totalPayment,
+            $balance,
+        ];
+        foreach ($orders as $order) {
+            $totalAdvance += $order->advance;
+            $balance = $balance  - $order->advance;
             // Add cow details if amount > 0
             if ($order->cow_amt > 0) {
+                $balance = $balance + $order->cow_amt;
                 $orderData[] = [
                     $order->location_id ?? 'N/A',
                     $order->customer->last_name ?? 'N/A',
@@ -447,10 +537,11 @@ class OrderController extends Controller
                     $order->remark,
                     $order->advance,
                     $order->payment,
+                    $balance
                 ];
                 $totalAmount += $order->cow_amt;
-                $totalAdvance += $order->advance;
-                $totalPayment += $order->payment;
+
+
                 $count++;
                 $avgFat += $order->cow_fat;
                 $avgSNF += $order->cow_snf;
@@ -459,6 +550,7 @@ class OrderController extends Controller
 
             // Add buffalo details if amount > 0
             if ($order->buffalo_amt > 0) {
+                $balance = $balance + $order->buffalo_amt;
                 $orderData[] = [
                     $order->location_id ?? 'N/A',
                     $order->customer->last_name ?? 'N/A',
@@ -475,10 +567,10 @@ class OrderController extends Controller
                     $order->remark,
                     $order->advance,
                     $order->payment,
+                    $balance
                 ];
                 $totalAmount += $order->buffalo_amt;
-                $totalAdvance += $order->advance;
-                $totalPayment += $order->payment;
+
                 $count++;
                 $avgFat += $order->buffalo_fat;
                 $avgSNF += $order->buffalo_snf;
@@ -487,6 +579,7 @@ class OrderController extends Controller
 
             // Add mixed details if amount > 0
             if ($order->mixed_amt > 0) {
+                $balance = $balance + $order->mixed_amt;
                 $orderData[] = [
                     $order->location_id ?? 'N/A',
                     $order->customer->last_name ?? 'N/A',
@@ -503,16 +596,19 @@ class OrderController extends Controller
                     $order->remark,
                     $order->advance,
                     $order->payment,
+                    $balance
                 ];
                 $totalAmount += $order->mixed_amt;
-                $totalAdvance += $order->advance;
-                $totalPayment += $order->payment;
+
+
                 $count++;
                 $avgFat += $order->mixed_fat;
                 $avgSNF += $order->mixed_snf;
                 $totalLitres += $order->mixed_litres;
             }
             if ($order->payment > 0) {
+                $totalPayment += $order->payment;
+                $balance = $balance - $order->payment;
                 $orderData[] = [
                     $order->location_id ?? 'N/A',
                     $order->customer->last_name ?? 'N/A',
@@ -529,9 +625,8 @@ class OrderController extends Controller
                     $order->remark,
                     '',
                     $order->payment,
+                    $balance
                 ];
-
-                $totalPayment += $order->payment;
             }
         }
 
