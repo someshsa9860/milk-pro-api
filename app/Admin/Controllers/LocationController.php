@@ -63,8 +63,8 @@ class LocationController extends AdminController
     {
         $form = new Form(new Location());
 
-        $form->text('location_id', __('Location (Don;t change once set)'))->rules('unique:locations');
-        $form->text('location_name', __('Location Name'))->rules('unique:locations');
+        $form->text('location_id', __('Location (Don;t change once set)'))->rules('unique:locations')->required();
+        $form->text('location_name', __('Location Name'))->rules('unique:locations')->required();
 
         return $form;
     }
