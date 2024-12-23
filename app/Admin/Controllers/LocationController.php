@@ -25,12 +25,13 @@ class LocationController extends AdminController
     protected function grid()
     {
         $grid = new Grid(new Location());
+        $grid->quickSearch('location_name','location_id');
 
-        $grid->column('id', __('Id'));
-        $grid->column('location_id', __('Location id'));
-        $grid->column('location_name', __('Location Name'));
-        $grid->column('created_at', __('Created at'));
-        $grid->column('updated_at', __('Updated at'));
+        $grid->column('id', __('Id'))->sortable();
+        $grid->column('location_id', __('Location id'))->sortable();
+        $grid->column('location_name', __('Location Name'))->sortable();
+        $grid->column('created_at', __('Created at'))->sortable();
+        $grid->column('updated_at', __('Updated at'))->sortable();
 
         return $grid;
     }
