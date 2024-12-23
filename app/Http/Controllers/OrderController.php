@@ -214,7 +214,7 @@ class OrderController extends Controller
 
         // If customer_id is null, group by customer_id and calculate sums
 
-        if (isset($location_id))
+        if (!isset($location_id))
          {
             $orders = $orders->groupBy('location_id');
         }else{
