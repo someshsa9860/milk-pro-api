@@ -30,23 +30,8 @@ class OrderController extends Controller
     }
     public  function place(Request $request)
     {
-        // $request->validate([
-        //     'cust_id'=>'required',
-        //     'shift'=>'required',
-        // ]);
-        // $customer=UserData::find($request->cust_id);
-        // $sale=MSales::updateOrCreate([
-        //     'p_id'=>$request->id
-        // ],[
-        //     'usermail'=>auth()->user()->email,
-        //     'userrout'=>auth()->user()->route,
-        //     'indate'=>now(tz:'Asia/Kolkata'),
-        //     'route'=>$customer->route,
-        //     'cname'=>$customer->last_name,
-        //     'cname'=>$customer->last_name,
-        //     'billno'=>$this->generateInvoice(),
-        //     'shift'=>$request->shift,
-        // ]);
+
+
 
         $order_date_time = $request->order_date_time;
         if (isset($request->order_date_time)) {
@@ -120,6 +105,45 @@ class OrderController extends Controller
 
 
         return response($order);
+    }
+    public  function makePaymentEntry(Request $request)
+    {
+
+
+
+        $order_date_time = $request->order_date_time;
+        $user = User::find(auth()->user()->id);
+        if (isset($request->order_date_time)) {
+            if ($user->can_edit_order_date != 1) {
+                $order_date_time = null;
+            }
+        }
+
+        $order = Order::updateOrCreate(
+            [
+                'id' => $request->id,
+                'location_id' => auth()->user()->location_id ?? Admin::user()->id
+            ],
+            [
+                'customer_id' => $request->customer_id,
+                'is_sell' => $request->is_sell,
+                'user_id' => auth()->user()->id,
+                'payment' => $request->payment,
+                'order_date_time' => $order_date_time ?? date("Y-m-d h:i:s"),
+                'remark' => $request->remark,
+            ]
+        );
+
+        $order->load(['customer']);
+        $balanceData = Order::where('customer_id', $request->customer_id)->selectRaw(DB::raw("SUM(advance) as advance,SUM(payment) as payment,SUM(total) as total"))->first();
+        $balance = $balanceData->total - $balanceData->payment - $balanceData->advance;
+        $totalAmount = $balanceData->total;
+        $totalAdvance = $balanceData->advance;
+        $totalPayment = $balanceData->payment;
+        return response([
+            'model'=>$order,
+            'balance'=>'Balance Rs. '.$balance.', Total Milk Amount Rs. '.$totalAmount.', Total Advance Received Rs. '.$totalAdvance.' Total Amount Paid is '.$totalPayment.' . By VSP-'.$user->name.' BANCI DAIRY FOOD.'
+        ]);
     }
 
     public function orders()
@@ -214,18 +238,17 @@ class OrderController extends Controller
 
         // If customer_id is null, group by customer_id and calculate sums
 
-        if (!isset($location_id))
-         {
+        if (!isset($location_id)) {
             $orders = $orders->groupBy('location_id');
-        }else{
-           
+        } else {
+
             $orders = $orders->groupBy('customer_id');
             // $orders = $orders->groupBy('location_id');
 
         }
-        
 
-        Log::channel('callvcal')->info('request: '.json_encode([$from, $to, $customer_id, $location_id]).', data: '.json_encode($orders));
+
+        Log::channel('callvcal')->info('request: ' . json_encode([$from, $to, $customer_id, $location_id]) . ', data: ' . json_encode($orders));
 
 
 
@@ -249,7 +272,7 @@ class OrderController extends Controller
             $closing_balance = $total_amount - $total_payment - $total_advance;
 
             // $vsp = $group->first()->location_id;
-            $vsp =Location::where('location_id',$group->first()->location_id)->first()->location_name?? $group->first()->location_id?? $group->first()->user->name ?? '-';
+            $vsp = Location::where('location_id', $group->first()->location_id)->first()->location_name ?? $group->first()->location_id ?? $group->first()->user->name ?? '-';
             $member = 'all';
             if (isset($location_id)) {
                 $member = $group->first()->customer->last_name ?? $member;
@@ -476,7 +499,7 @@ class OrderController extends Controller
         // Log::channel('callvcal')->info('export:'.json_encode($orders));
 
         // Define headers
-       
+
         ///formula: balance= total-payment-advance
 
         // Initialize total counters
