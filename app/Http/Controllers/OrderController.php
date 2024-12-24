@@ -152,7 +152,7 @@ class OrderController extends Controller
         $totalAdvance = $balanceData->advance ?? 0;
         $totalPayment = $balanceData->payment ?? 0;
         $balance = $totalAmount - $totalPayment - $totalAdvance;
-        $date = $order->order_date_time;
+        $date = \Carbon\Carbon::parse($order->order_date_time)->format('d-M-Y h:i A');
     
         $responseMessage = sprintf(
             "Paid Rs. %s on %s. Balance Rs. %s, Total Milk Amount Rs. %s, Total Advance Received Rs. %s, Total Amount Paid is Rs. %s. By VSP-%s BANCI DAIRY FOOD.",
