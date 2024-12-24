@@ -155,14 +155,13 @@ class OrderController extends Controller
         $date = \Carbon\Carbon::parse($order->order_date_time)->format('d-M-Y h:i A');
     
         $responseMessage = sprintf(
-            "Paid Rs. %s on %s. Balance Rs. %s, Total Milk Amount Rs. %s, Total Advance Received Rs. %s, Total Amount Paid is Rs. %s. By VSP-%s BANCI DAIRY FOOD.",
-            $validatedData['payment'], 
-            $date, 
-            $balance, 
-            $totalAmount, 
-            $totalAdvance, 
-            $totalPayment, 
-            $user->name
+            "Dt.%s\nPaid Amt. -%s rs\nT. Milk Amt.-%s rs\nT. Advance -%s rs\nBal.Amt.- %s rs\nT. Paid Amt - %s rs",
+            $date,
+            number_format($validatedData['payment'], 1),
+            number_format($totalAmount, 1),
+            number_format($totalAdvance, 1),
+            number_format($balance, 1),
+            number_format($totalPayment, 1)
         );
     
         return response([
