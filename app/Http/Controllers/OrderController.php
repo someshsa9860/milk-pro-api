@@ -129,7 +129,7 @@ class OrderController extends Controller
     
         $order = Order::updateOrCreate(
             [
-                'id' => $validatedData['id'],
+                'id' => $validatedData['id']??null,
                 'location_id' => $user->location_id ?? optional(Admin::user())->id,
             ],
             [
