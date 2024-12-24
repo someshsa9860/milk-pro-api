@@ -106,45 +106,71 @@ class OrderController extends Controller
 
         return response($order);
     }
-    public  function makePaymentEntry(Request $request)
+    public function makePaymentEntry(Request $request)
     {
-
-
-
-        $order_date_time = $request->order_date_time;
-        $user = User::find(auth()->user()->id);
-        if (isset($request->order_date_time)) {
-            if ($user->can_edit_order_date != 1) {
-                $order_date_time = null;
-            }
+        $user = auth()->user();
+        if (!$user) {
+            return response(['error' => 'Unauthorized'], 401);
         }
-
+    
+        $validatedData = $request->validate([
+            'id' => 'nullable|integer',
+            'customer_id' => 'required|integer',
+            'is_sell' => 'required|boolean',
+            'payment' => 'required|numeric|min:0',
+            'order_date_time' => 'nullable|date',
+            'remark' => 'nullable|string',
+        ]);
+    
+        $order_date_time = $validatedData['order_date_time'] ?? null;
+        if ($order_date_time && $user->can_edit_order_date != 1) {
+            $order_date_time = null;
+        }
+    
         $order = Order::updateOrCreate(
             [
-                'id' => $request->id,
-                'location_id' => auth()->user()->location_id ?? Admin::user()->id
+                'id' => $validatedData['id'],
+                'location_id' => $user->location_id ?? optional(Admin::user())->id,
             ],
             [
-                'customer_id' => $request->customer_id,
-                'is_sell' => $request->is_sell,
-                'user_id' => auth()->user()->id,
-                'payment' => $request->payment,
-                'order_date_time' => $order_date_time ?? date("Y-m-d h:i:s"),
-                'remark' => $request->remark,
+                'customer_id' => $validatedData['customer_id'],
+                'is_sell' => $validatedData['is_sell'],
+                'user_id' => $user->id,
+                'payment' => $validatedData['payment'],
+                'order_date_time' => $order_date_time ?? now(),
+                'remark' => $validatedData['remark'],
             ]
         );
-
+    
         $order->load(['customer']);
-        $balanceData = Order::where('customer_id', $request->customer_id)->selectRaw(DB::raw("SUM(advance) as advance,SUM(payment) as payment,SUM(total) as total"))->first();
-        $balance = $balanceData->total - $balanceData->payment - $balanceData->advance;
-        $totalAmount = $balanceData->total;
-        $totalAdvance = $balanceData->advance;
-        $totalPayment = $balanceData->payment;
+    
+        $balanceData = Order::where('customer_id', $validatedData['customer_id'])
+            ->selectRaw("SUM(advance) as advance, SUM(payment) as payment, SUM(total) as total")
+            ->first();
+    
+        $totalAmount = $balanceData->total ?? 0;
+        $totalAdvance = $balanceData->advance ?? 0;
+        $totalPayment = $balanceData->payment ?? 0;
+        $balance = $totalAmount - $totalPayment - $totalAdvance;
+        $date = $order->order_date_time;
+    
+        $responseMessage = sprintf(
+            "Paid Rs. %s on %s. Balance Rs. %s, Total Milk Amount Rs. %s, Total Advance Received Rs. %s, Total Amount Paid is Rs. %s. By VSP-%s BANCI DAIRY FOOD.",
+            $validatedData['payment'], 
+            $date, 
+            $balance, 
+            $totalAmount, 
+            $totalAdvance, 
+            $totalPayment, 
+            $user->name
+        );
+    
         return response([
-            'model'=>$order,
-            'balance'=>'Balance Rs. '.$balance.', Total Milk Amount Rs. '.$totalAmount.', Total Advance Received Rs. '.$totalAdvance.' Total Amount Paid is '.$totalPayment.' . By VSP-'.$user->name.' BANCI DAIRY FOOD.'
+            'model' => $order,
+            'balance' => $responseMessage,
         ]);
     }
+    
 
     public function orders()
     {
