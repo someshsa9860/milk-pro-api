@@ -452,8 +452,8 @@ class OrderController extends Controller
         //     return count($values) > 0 ? array_sum($values) / count($values) : 0;
         // }), 2);
         
-        $overallAvgFat=round($avg_fat/$count,2);
-        $overallAvgSNF=round($avg_snf/$count,2);
+        $overallAvgFat=round($avgFat/$count,2);
+        $overallAvgSNF=round($avgSNF/$count,2);
 
         $sheet->setCellValue('E' . $row, 'Total');
         $sheet->mergeCells('A' . $row . ':E' . $row); // Merge for better display
