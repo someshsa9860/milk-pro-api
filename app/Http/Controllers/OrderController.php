@@ -112,7 +112,7 @@ class OrderController extends Controller
         if (!$user) {
             return response(['error' => 'Unauthorized'], 401);
         }
-    
+
         $validatedData = $request->validate([
             'id' => 'nullable|integer',
             'customer_id' => 'required|integer',
@@ -121,15 +121,15 @@ class OrderController extends Controller
             'order_date_time' => 'nullable|date',
             'remark' => 'nullable|string',
         ]);
-    
+
         $order_date_time = $validatedData['order_date_time'] ?? null;
         if ($order_date_time && $user->can_edit_order_date != 1) {
             $order_date_time = null;
         }
-    
+
         $order = Order::updateOrCreate(
             [
-                'id' => $validatedData['id']??null,
+                'id' => $validatedData['id'] ?? null,
                 'location_id' => $user->location_id ?? optional(Admin::user())->id,
             ],
             [
@@ -141,19 +141,19 @@ class OrderController extends Controller
                 'remark' => $validatedData['remark'],
             ]
         );
-    
+
         $order->load(['customer']);
-    
+
         $balanceData = Order::where('customer_id', $validatedData['customer_id'])
             ->selectRaw("SUM(advance) as advance, SUM(payment) as payment, SUM(total) as total")
             ->first();
-    
+
         $totalAmount = $balanceData->total ?? 0;
         $totalAdvance = $balanceData->advance ?? 0;
         $totalPayment = $balanceData->payment ?? 0;
         $balance = $totalAmount - $totalPayment - $totalAdvance;
         $date = \Carbon\Carbon::parse($order->order_date_time)->format('d-M-Y h:i A');
-    
+
         $responseMessage = sprintf(
             "Dt.%s\nPaid Amt. -%s rs\nT. Milk Amt.-%s rs\nT. Advance -%s rs\nBal.Amt.- %s rs\nT. Paid Amt - %s rs",
             $date,
@@ -163,13 +163,13 @@ class OrderController extends Controller
             number_format($balance, 1),
             number_format($totalPayment, 1)
         );
-    
+
         return response([
             'model' => $order,
             'balance' => $responseMessage,
         ]);
     }
-    
+
 
     public function orders()
     {
@@ -275,7 +275,7 @@ class OrderController extends Controller
 
         Log::channel('callvcal')->info('request: ' . json_encode([$from, $to, $customer_id, $location_id]) . ', data: ' . json_encode($orders));
 
-
+        $count = 0;
 
         foreach ($orders as $group) {
             $total_litres = $group->sum(fn ($order) => $order->cow_litres + $order->buffalo_litres + $order->mixed_litres);
@@ -288,9 +288,16 @@ class OrderController extends Controller
             $totalAdvance += $total_advance;
             $totalPayment += $total_payment;
 
-            $avg_fat = round($group->avg(fn ($order) => $order->cow_fat + $order->buffalo_fat + $order->mixed_fat), 2);
-            $avg_snf = round($group->avg(fn ($order) => $order->cow_snf + $order->buffalo_snf + $order->mixed_snf), 2);
-
+            $avg_fat = round($group->avg(function ($order) {
+                $values = array_filter([$order->cow_fat, $order->buffalo_fat, $order->mixed_fat], fn($value) => $value > 0);
+                return count($values) > 0 ? array_sum($values) / count($values) : 0;
+            }), 2);
+            
+            $avg_snf = round($group->avg(function ($order) {
+                $values = array_filter([$order->cow_snf, $order->buffalo_snf, $order->mixed_snf], fn($value) => $value > 0);
+                return count($values) > 0 ? array_sum($values) / count($values) : 0;
+            }), 2);
+            
             $avgFat += $avg_fat;
             $avgSNF += $avg_snf;
 
@@ -428,14 +435,23 @@ class OrderController extends Controller
             $row++;
         }
 
-        $count = count($orderData);
+        // $count = count($orderData);
         $count = max(1, $count);
-
+        $overallAvgFat = round($orders->avg(function ($order) {
+            $values = array_filter([$order->cow_fat, $order->buffalo_fat, $order->mixed_fat], fn($value) => $value > 0);
+            return count($values) > 0 ? array_sum($values) / count($values) : 0;
+        }), 2);
+        
+        $overallAvgSNF = round($orders->avg(function ($order) {
+            $values = array_filter([$order->cow_snf, $order->buffalo_snf, $order->mixed_snf], fn($value) => $value > 0);
+            return count($values) > 0 ? array_sum($values) / count($values) : 0;
+        }), 2);
+        
         $sheet->setCellValue('E' . $row, 'Total');
         $sheet->mergeCells('A' . $row . ':E' . $row); // Merge for better display
         $sheet->setCellValue('F' . $row, $totalLitres); // Total Amount
-        $sheet->setCellValue('G' . $row, round(($avgFat) / ($count), 2)); // Total Amount
-        $sheet->setCellValue('H' . $row, round($avgSNF / $count, 2)); // Total Amount
+        $sheet->setCellValue('G' . $row, $overallAvgFat); // Overall Avg Fat
+        $sheet->setCellValue('H' . $row, $overallAvgSNF); // Overall Avg SNF
         $sheet->setCellValue('K' . $row, $totalAmount); // Total Amount
         $sheet->setCellValue('M' . $row, $totalAdvance); // Total Advance
         $sheet->setCellValue('O' . $row, $totalPayment); // Total Payment
