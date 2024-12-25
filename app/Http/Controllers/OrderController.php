@@ -300,6 +300,9 @@ class OrderController extends Controller
             
             $avgFat += $avg_fat;
             $avgSNF += $avg_snf;
+            if($avg_fat>0){
+                $count++;
+            }
 
             $closing_balance = $total_amount - $total_payment - $total_advance;
 
@@ -437,16 +440,21 @@ class OrderController extends Controller
 
         // $count = count($orderData);
         $count = max(1, $count);
-        $overallAvgFat = round($orders->avg(function ($order) {
-            $values = array_filter([$order->cow_fat, $order->buffalo_fat, $order->mixed_fat], fn($value) => $value > 0);
-            return count($values) > 0 ? array_sum($values) / count($values) : 0;
-        }), 2);
+
+
+        // $overallAvgFat = round($orders->avg(function ($order) {
+        //     $values = array_filter([$order->cow_fat, $order->buffalo_fat, $order->mixed_fat], fn($value) => $value > 0);
+        //     return count($values) > 0 ? array_sum($values) / count($values) : 0;
+        // }), 2);
         
-        $overallAvgSNF = round($orders->avg(function ($order) {
-            $values = array_filter([$order->cow_snf, $order->buffalo_snf, $order->mixed_snf], fn($value) => $value > 0);
-            return count($values) > 0 ? array_sum($values) / count($values) : 0;
-        }), 2);
+        // $overallAvgSNF = round($orders->avg(function ($order) {
+        //     $values = array_filter([$order->cow_snf, $order->buffalo_snf, $order->mixed_snf], fn($value) => $value > 0);
+        //     return count($values) > 0 ? array_sum($values) / count($values) : 0;
+        // }), 2);
         
+        $overallAvgFat=round($avg_fat/$count,2);
+        $overallAvgSNF=round($avg_snf/$count,2);
+
         $sheet->setCellValue('E' . $row, 'Total');
         $sheet->mergeCells('A' . $row . ':E' . $row); // Merge for better display
         $sheet->setCellValue('F' . $row, $totalLitres); // Total Amount
