@@ -89,20 +89,22 @@ class RateImporter implements ShouldQueue
                     $rate = $record[$headers[$h]];
 
                     foreach ($locations as $location) {
-                        foreach ($shifts as $shift) {
-                            $row = [
-                                'snf' => (float)$snf,
-                                'fat' => (float)$fat,
-                                'location_id' => $location,
-                                'shift' => (string)$shift,
-                                'rate' => (float)$rate,
-                            ];
-
-                            foreach ($types as $type) {
-                                $row[$type] = (float)$rate;
+                        if(isset($location)&&($location!='')){
+                            foreach ($shifts as $shift) {
+                                $row = [
+                                    'snf' => (float)$snf,
+                                    'fat' => (float)$fat,
+                                    'location_id' => $location,
+                                    'shift' => (string)$shift,
+                                    'rate' => (float)$rate,
+                                ];
+    
+                                foreach ($types as $type) {
+                                    $row[$type] = (float)$rate;
+                                }
+    
+                                $data[] = $row;
                             }
-
-                            $data[] = $row;
                         }
                     }
                 }
