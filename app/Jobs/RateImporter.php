@@ -133,7 +133,7 @@ class RateImporter implements ShouldQueue
      */
     private function bulkUpsert($data)
     {
-        // Define the table columns to match the `rate_lists` schema
+        // Define the table columns to match the `ratelist` schema
         $columns = ['snf', 'fat', 'location_id', 'shift', 'rate', 'cow', 'buffalo', 'mixed'];
     
         // Build the value placeholders for each row
@@ -148,7 +148,7 @@ class RateImporter implements ShouldQueue
     
         // Construct the SQL query
         $sql = "
-            INSERT INTO rate_lists (" . implode(', ', $columns) . ")
+            INSERT INTO ratelist (" . implode(', ', $columns) . ")
             VALUES " . implode(', ', $values) . "
             ON DUPLICATE KEY UPDATE
                 rate = IF(VALUES(rate) IS NOT NULL, VALUES(rate), rate),
