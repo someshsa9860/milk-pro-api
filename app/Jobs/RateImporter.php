@@ -128,13 +128,33 @@ class RateImporter implements ShouldQueue
     /**
      * Perform bulk upsert for rates.
      */
-    private function bulkUpsert($data)
-    {
-        $uniqueKeys = ['snf', 'fat', 'location_id', 'shift'];
-
-        RateList::upsert($data, $uniqueKeys, ['rate']);
-        Log::info('Bulk upserted ' . count($data) . ' records.');
+   private function bulkUpsert($data)
+{
+    // Collect all possible fields
+    $defaultUpdatableFields = ['rate', 'cow', 'buffalo', 'mixed'];
+    
+    // Determine fields to update dynamically
+    $updateFields = [];
+    foreach ($data as $row) {
+        foreach ($defaultUpdatableFields as $field) {
+            if (array_key_exists($field, $row)) {
+                $updateFields[] = $field;
+            }
+        }
     }
+
+    // Remove duplicate fields
+    $updateFields = array_unique($updateFields);
+
+    // Define unique keys for matching records
+    $uniqueKeys = ['fat', 'location_id', 'shift'];
+
+    // Perform the upsert operation
+    RateList::upsert($data, $uniqueKeys, $updateFields);
+
+    Log::info('Bulk upserted ' . count($data) . ' records with fields: ' . implode(', ', $updateFields));
+}
+
 
     /**
      * Retrieve locations based on location type.

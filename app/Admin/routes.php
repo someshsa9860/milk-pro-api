@@ -12,6 +12,7 @@ use App\Admin\Controllers\UserController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\OrderController as ControllersOrderController;
 use Illuminate\Routing\Router;
+use Illuminate\Support\Facades\File;
 
 Admin::routes();
 
@@ -41,6 +42,18 @@ Route::group([
     $router->post('/api/customers', [HomeController::class,'customers']);
 
     $router->resource('admin-device-lists', AdminDeviceListController::class);
+    $router->resource('clear/logs',function (){
+        try {
+            $logPath = storage_path('logs');
+            
+            // Remove all log files
+            File::cleanDirectory($logPath);
+    
+            return response()->json(['status' => 'success', 'message' => 'All logs cleared successfully.']);
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'message' => $e->getMessage()], 500);
+        }
+    });
 
 
 
