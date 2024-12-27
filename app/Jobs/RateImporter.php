@@ -9,6 +9,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use League\Csv\Reader;
 
@@ -130,32 +131,43 @@ class RateImporter implements ShouldQueue
     /**
      * Perform bulk upsert for rates.
      */
-   private function bulkUpsert($data)
-{
-    // Collect all possible fields
-    $defaultUpdatableFields = ['rate', 'cow', 'buffalo', 'mixed'];
+    private function bulkUpsert($data)
+    {
+        // Define the table columns to match the `rate_lists` schema
+        $columns = ['snf', 'fat', 'location_id', 'shift', 'rate', 'cow', 'buffalo', 'mixed'];
     
-    // Determine fields to update dynamically
-    $updateFields = [];
-    foreach ($data as $row) {
-        foreach ($defaultUpdatableFields as $field) {
-            if (array_key_exists($field, $row)) {
-                $updateFields[] = $field;
-            }
+        // Build the value placeholders for each row
+        $values = [];
+        foreach ($data as $row) {
+            $rowValues = array_map(function ($column) use ($row) {
+                return isset($row[$column]) ? "'" . addslashes($row[$column]) . "'" : "NULL";
+            }, $columns);
+    
+            $values[] = '(' . implode(', ', $rowValues) . ')';
+        }
+    
+        // Construct the SQL query
+        $sql = "
+            INSERT INTO rate_lists (" . implode(', ', $columns) . ")
+            VALUES " . implode(', ', $values) . "
+            ON DUPLICATE KEY UPDATE
+                rate = IF(VALUES(rate) IS NOT NULL, VALUES(rate), rate),
+                cow = IF(VALUES(cow) IS NOT NULL, VALUES(cow), cow),
+                buffalo = IF(VALUES(buffalo) IS NOT NULL, VALUES(buffalo), buffalo),
+                mixed = IF(VALUES(mixed) IS NOT NULL, VALUES(mixed), mixed);
+        ";
+    
+        // Execute the query
+        try {
+            DB::statement($sql);
+            Log::info('Bulk upserted ' . count($data) . ' records successfully.');
+        } catch (\Exception $e) {
+            Log::error('Failed to execute bulk upsert: ' . $e->getMessage(), [
+                'exception' => $e,
+            ]);
         }
     }
-
-    // Remove duplicate fields
-    $updateFields = array_unique($updateFields);
-
-    // Define unique keys for matching records
-    $uniqueKeys = ['snf','fat', 'location_id', 'shift'];
-
-    // Perform the upsert operation
-    RateList::upsert($data, $uniqueKeys, $updateFields);
-
-    Log::info('Bulk upserted ' . count($data) . ' records with fields: ' . implode(', ', $updateFields));
-}
+    
 
 
     /**
