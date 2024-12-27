@@ -149,7 +149,7 @@ class RateImporter implements ShouldQueue
     $updateFields = array_unique($updateFields);
 
     // Define unique keys for matching records
-    $uniqueKeys = ['fat', 'location_id', 'shift'];
+    $uniqueKeys = ['snf','fat', 'location_id', 'shift'];
 
     // Perform the upsert operation
     RateList::upsert($data, $uniqueKeys, $updateFields);
