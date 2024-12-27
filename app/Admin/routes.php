@@ -42,7 +42,7 @@ Route::group([
     $router->post('/api/customers', [HomeController::class,'customers']);
 
     $router->resource('admin-device-lists', AdminDeviceListController::class);
-    $router->resource('clear/logs',function (){
+    $router->get('clear/logs',function (){
         try {
             $logPath = storage_path('logs');
             
